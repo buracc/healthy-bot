@@ -7,7 +7,11 @@ import javax.persistence.*
 data class User(
     @Id
     var discordId: String,
-    var balance: Int = 0,
+    var cash: Int = 0,
+    var bank: Int = 0,
     @Enumerated(EnumType.STRING)
     var role: Role = Role.USER,
-)
+) {
+    val balance: Int
+        get() = cash + bank
+}

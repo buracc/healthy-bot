@@ -7,14 +7,14 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.utils.data.DataObject
 
-data class DiscordCommand(
+data class DiscordCommand<T>(
     private var name: String,
     val description: String,
     val private: Boolean = false,
     var enabled: Boolean = true,
     val options: Map<String, OptionData> = mapOf(),
     val reply: String = "Processing command...",
-    val handler: (SlashCommandInteractionEvent) -> Unit
+    val handler: (SlashCommandInteractionEvent) -> T
 ) : CommandData {
     fun buildSlashCommand(): CommandData {
         return Commands.slash(name, description)
