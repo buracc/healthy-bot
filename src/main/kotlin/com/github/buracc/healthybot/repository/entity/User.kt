@@ -12,11 +12,11 @@ data class User(
     var bank: Int = 0,
     @Enumerated(EnumType.STRING)
     var role: Role = Role.USER,
-    var lastRob: Instant = Instant.now().minusMillis(60_000)
+    var robCooldown: Instant = Instant.now(),
+    var workCooldown: Instant = Instant.now(),
+    var crimeCooldown: Instant = Instant.now(),
+    var slutCooldown: Instant = Instant.now(),
 ) {
     val balance: Int
         get() = cash + bank
-
-    val robCooldown: Long
-        get() = lastRob.toEpochMilli() - Instant.now().toEpochMilli()
 }

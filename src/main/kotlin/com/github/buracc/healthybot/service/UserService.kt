@@ -12,7 +12,7 @@ class UserService(
     fun findById(id: String) = userRepository.findById(id).orElseThrow { UnauthorizedException("User not found.") }
 
     fun findTop10() = userRepository.findAll()
-        .sortedBy { it.balance }
+        .sortedByDescending { it.balance }
         .take(10)
 
     fun save(user: User) = userRepository.save(user)
