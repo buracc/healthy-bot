@@ -131,7 +131,7 @@ class CasinoCommandHandler(
             ?: throw NotFoundException("Couldn't find user: ${selectedUser}.")
 
         val target = userService.findById(discordUser.id)
-        val fine = getCashReward(user.balance)
+        val fine = getCashReward(1000) + getCashReward(user.balance)
         user.robCooldown = Instant.now().plusMillis(60_000)
 
         if (target.cash < 0) {
@@ -169,14 +169,14 @@ class CasinoCommandHandler(
             throw BotException("You cannot commit a crime for another $cd seconds.")
         }
 
+        val reward = getCashReward(1000)
         user.crimeCooldown = Instant.now().plusMillis(60_000)
         if (ThreadLocalRandom.current().nextBoolean()) {
-            val fine = getCashReward(user.balance)
+            val fine = reward + getCashReward(user.balance)
             userService.save(user.also { it.cash -= fine })
             throw BotException("You failed to commit a crime and paid $fine in damages.")
         }
 
-        val reward = getCashReward(1000)
         userService.save(user.also { it.cash += reward })
         return "You commit a crime and receive $reward."
     }
@@ -188,14 +188,14 @@ class CasinoCommandHandler(
             throw BotException("You cannot be a slut for another $cd seconds.")
         }
 
+        val reward = getCashReward(1000)
         user.slutCooldown = Instant.now().plusMillis(60_000)
         if (ThreadLocalRandom.current().nextBoolean()) {
-            val fine = getCashReward(user.balance)
+            val fine = reward + getCashReward(user.balance)
             userService.save(user.also { it.cash -= fine })
             throw BotException("You failed to be a slut and paid $fine in damages.")
         }
 
-        val reward = getCashReward(1000)
         userService.save(user.also { it.cash += reward })
         return "You're a good slut, so you receive $reward."
     }
