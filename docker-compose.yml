@@ -28,7 +28,7 @@ services:
     command: -p 5401
 
   healthy-bot:
-    image: unethicalite/healthy-bot:latest
+    build: .
     ports:
       - "8080:8080"
     environment:
