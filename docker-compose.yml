@@ -18,14 +18,8 @@ services:
     build: .
     ports:
       - "8080:8080"
-    environment:
-      - DISCORD_BOT_AUTH_TOKEN=
-      - DISCORD_GUILD_ID=
-      - DB_HOST=healthybot-db
-      - DB_NAME=healthybot
-      - DB_USERNAME=healthybot
-      - DB_PASSWORD=healthybot
-      - DB_PORT=5400
+    env_file:
+      - .env
 
 volumes:
   healthybot-db:
