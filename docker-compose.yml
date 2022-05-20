@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  healthybot-db:
+    image: postgres:alpine
+    hostname: healthybot-db
+    ports:
+      - "5400:5400"
+    environment:
+      - POSTGRES_DB=healthybot
+      - POSTGRES_USER=healthybot
+      - POSTGRES_PASSWORD=healthybot
+    volumes:
+      - healthybot-db:/var/lib/postgresql/data
+    command: -p 5400
+
+  healthybot-dev-db:
+    image: postgres:alpine
+    hostname: healthybot-dev-db
+    ports:
+      - "5401:5401"
+    environment:
+      - POSTGRES_DB=healthybot
+      - POSTGRES_USER=healthybot
+      - POSTGRES_PASSWORD=healthybot
+    volumes:
+      - healthybot-dev-db:/var/lib/postgresql/data
+    command: -p 5401
+
+  healthy-bot:
+    image: unethicalite/healthy-bot:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - DISCORD_BOT_AUTH_TOKEN=
+      - DISCORD_GUILD_ID=
+      - DB_HOST=healthybot-db
+      - DB_NAME=healthybot
+      - DB_USERNAME=healthybot
+      - DB_PASSWORD=healthybot
+      - DB_PORT=5400
+
+volumes:
+  healthybot-db:
+  healthybot-dev-db:
