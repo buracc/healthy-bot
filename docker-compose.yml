@@ -14,19 +14,6 @@ services:
       - healthybot-db:/var/lib/postgresql/data
     command: -p 5400
 
-  healthybot-dev-db:
-    image: postgres:alpine
-    hostname: healthybot-dev-db
-    ports:
-      - "5401:5401"
-    environment:
-      - POSTGRES_DB=healthybot
-      - POSTGRES_USER=healthybot
-      - POSTGRES_PASSWORD=healthybot
-    volumes:
-      - healthybot-dev-db:/var/lib/postgresql/data
-    command: -p 5401
-
   healthy-bot:
     build: .
     ports:
@@ -42,4 +29,3 @@ services:
 
 volumes:
   healthybot-db:
-  healthybot-dev-db:
