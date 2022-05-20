@@ -1,6 +1,7 @@
 package com.github.buracc.healthybot.discord.handlers
 
 import com.github.buracc.healthybot.discord.exception.BotException
+import com.github.buracc.healthybot.discord.exception.CasinoException
 import com.github.buracc.healthybot.discord.model.DiscordCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
@@ -41,6 +42,7 @@ abstract class SlashCommandHandler : ListenerAdapter() {
                         )
                         .queue()
                 }
+
                 is MessageEmbed -> {
                     event.hook
                         .sendMessageEmbeds(response)
@@ -49,8 +51,18 @@ abstract class SlashCommandHandler : ListenerAdapter() {
             }
 
         } catch (ex: BotException) {
+            val embed = EmbedBuilder()
+                .setFooter("HealthyBot")
+                .setColor(Color.RED)
+                .setThumbnail(jda.selfUser.avatarUrl)
+                .setDescription(ex.message)
+
+            if (ex is CasinoException) {
+                embed.setTitle("Casino")
+            }
+
             event.hook
-                .sendMessage("Error: ${ex.message}")
+                .sendMessageEmbeds(embed.build())
                 .queue()
         }
     }
