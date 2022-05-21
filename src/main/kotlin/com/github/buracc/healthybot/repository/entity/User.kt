@@ -8,7 +8,7 @@ import javax.persistence.*
 data class User(
     @Id
     var discordId: String,
-    var cash: Int = 0,
+    var cash: Int = 1000,
     var bank: Int = 0,
     @Enumerated(EnumType.STRING)
     var role: Role = Role.USER,

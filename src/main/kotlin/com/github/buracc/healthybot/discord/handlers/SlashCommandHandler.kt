@@ -27,40 +27,35 @@ abstract class SlashCommandHandler : ListenerAdapter() {
         logger.info("Command '${event.name}' received from ${sender.name}, ${event.options}")
         event.deferReply().setEphemeral(command.private).queue()
 
+        var embed = EmbedBuilder()
+            .setFooter("HealthyBot")
+            .setThumbnail(jda.selfUser.avatarUrl)
+
         try {
             when (val response = command.handler(event)) {
                 is String -> {
-                    event.hook
-                        .sendMessageEmbeds(
-                            EmbedBuilder()
-                                .setTitle("Casino")
-                                .setFooter("HealthyBot")
-                                .setColor(Color.YELLOW)
-                                .setThumbnail(jda.selfUser.avatarUrl)
-                                .setDescription(response)
-                                .build()
-                        )
-                        .queue()
+                    embed
+                        .setTitle("Casino")
+                        .setColor(Color.YELLOW)
+                        .setDescription(response)
                 }
 
-                is MessageEmbed -> {
-                    event.hook
-                        .sendMessageEmbeds(response)
-                        .queue()
+                is EmbedBuilder -> {
+                    embed = response
                 }
             }
-
         } catch (ex: BotException) {
-            val embed = EmbedBuilder()
-                .setFooter("HealthyBot")
-                .setColor(Color.RED)
-                .setThumbnail(jda.selfUser.avatarUrl)
-                .setDescription(ex.message)
-
             if (ex is CasinoException) {
                 embed.setTitle("Casino")
             }
 
+            embed.setColor(Color.RED)
+            embed.setDescription(ex.message)
+        } catch (ex: Exception) {
+            logger.error("Command execution failed.", ex)
+            embed.setColor(Color.RED)
+            embed.setDescription("Failed to execute command. Check the logs.")
+        } finally {
             event.hook
                 .sendMessageEmbeds(embed.build())
                 .queue()
@@ -90,10 +85,10 @@ abstract class SlashCommandHandler : ListenerAdapter() {
 //            it.delete().complete()
 //        }
 
-        commandData.forEach {
-            logger.info("Registering command '${it.name}'")
-            guild.upsertCommand(it).complete()
-        }
+//        commandData.forEach {
+//            logger.info("Registering command '${it.name}'")
+//            guild.upsertCommand(it).complete()
+//        }
     }
 
     protected abstract val jda: JDA

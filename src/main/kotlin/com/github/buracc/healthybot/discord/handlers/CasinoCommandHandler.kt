@@ -6,7 +6,6 @@ import com.github.buracc.healthybot.discord.exception.NotFoundException
 import com.github.buracc.healthybot.discord.exception.UnauthorizedException
 import com.github.buracc.healthybot.discord.model.DiscordCommand
 import com.github.buracc.healthybot.repository.entity.Role
-import com.github.buracc.healthybot.repository.entity.User
 import com.github.buracc.healthybot.service.UserService
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service
 import java.awt.Color
 import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.math.abs
 import kotlin.random.Random
 
 @Service
@@ -27,10 +27,10 @@ class CasinoCommandHandler(
     private val userService: UserService
 ) : SlashCommandHandler() {
     override val commands: Map<String, DiscordCommand<*>> = mapOf(
-        "setup" to DiscordCommand(
-            name = "setup",
-            description = "Sets up a new casino round. Resets the current round.",
-            handler = ::setup
+        "reset" to DiscordCommand(
+            name = "reset",
+            description = "Resets the casino.",
+            handler = ::reset
         ),
         "balance" to DiscordCommand(
             name = "balance",
@@ -70,27 +70,20 @@ class CasinoCommandHandler(
         ),
     )
 
-    private fun setup(event: SlashCommandInteractionEvent): String {
+    private fun reset(event: SlashCommandInteractionEvent): String {
         val user = userService.findById(event.user.id)
         if (user.role != Role.ADMIN) {
             throw UnauthorizedException("You are not authorized to run this command.")
         }
 
-        val members =
-            event.guild?.members?.filter { !it.user.isBot } ?: throw NotFoundException("Failed to load guild members.")
-        val users = userService.saveAll(members.map {
-            User(
-                discordId = it.id,
-                cash = 1000
-            )
-        })
+        userService.clear()
 
-        return "New casino round started with ${users.count()} members."
+        return "Successfully reset the casino."
     }
 
     private fun balance(event: SlashCommandInteractionEvent): String {
         val selectedUser = event.getOption("user")?.asString
-        val userId: String = if (selectedUser == null) {
+        val userId = if (selectedUser == null) {
             event.user.id
         } else {
             event.guild?.members?.firstOrNull(filterMember(selectedUser))?.id
@@ -101,7 +94,7 @@ class CasinoCommandHandler(
         return "${jda.getUserById(user.discordId)?.asMention}'s balance: ${user.cash} Cash | ${user.bank} Banked"
     }
 
-    private fun top10(event: SlashCommandInteractionEvent): MessageEmbed {
+    private fun top10(event: SlashCommandInteractionEvent): EmbedBuilder {
         val builder = EmbedBuilder()
         builder.setTitle("Casino Top 10")
         builder.setColor(Color.YELLOW)
@@ -115,10 +108,10 @@ class CasinoCommandHandler(
             )
         }
 
-        return builder.build()
+        return builder
     }
 
-    private fun rob(event: SlashCommandInteractionEvent): String {
+    fun rob(event: SlashCommandInteractionEvent): String {
         val selectedUser = event.getOption("user")?.asString
             ?: throw NotFoundException("No user specified.")
 
@@ -127,21 +120,21 @@ class CasinoCommandHandler(
         if (cd > 0) {
             throw BotException("You cannot rob a user for another $cd seconds.")
         }
-        val discordUser = event.guild?.members?.firstOrNull(filterMember(selectedUser))
+        val discordUser = event.guild?.members?.also { println(it.map { m -> "${m.effectiveName} ${m.nickname} ${m.id}" }) }?.firstOrNull(filterMember(selectedUser))
             ?: throw NotFoundException("Couldn't find user: ${selectedUser}.")
 
         val target = userService.findById(discordUser.id)
-        val fine = getCashReward(1000) + getCashReward(user.balance)
+        val fine = getCashReward(abs(user.balance))
         user.robCooldown = Instant.now().plusMillis(60_000)
 
         if (target.cash < 0) {
-            userService.save(user.also { it.cash -= fine })
+            userService.save(user.also { it.cash -= getCashReward(1000) + fine })
             throw CasinoException("You have been fined $fine for trying to rob a poor person.")
         }
 
         if (ThreadLocalRandom.current().nextBoolean()) {
-            userService.save(user.also { it.cash -= fine })
-            throw CasinoException("You failed to rob ${discordUser.user.asMention}, and was fined $fine.")
+            userService.save(user.also { it.cash -= getCashReward(1000) + fine })
+            throw CasinoException("You failed to rob ${discordUser.user.asMention}, and were fined $fine.")
         }
 
         userService.save(user.also { it.cash += fine })
@@ -172,7 +165,7 @@ class CasinoCommandHandler(
         val reward = getCashReward(1000)
         user.crimeCooldown = Instant.now().plusMillis(60_000)
         if (ThreadLocalRandom.current().nextBoolean()) {
-            val fine = reward + getCashReward(user.balance)
+            val fine = reward + getCashReward(abs(user.balance))
             userService.save(user.also { it.cash -= fine })
             throw BotException("You failed to commit a crime and paid $fine in damages.")
         }
@@ -191,7 +184,7 @@ class CasinoCommandHandler(
         val reward = getCashReward(1000)
         user.slutCooldown = Instant.now().plusMillis(60_000)
         if (ThreadLocalRandom.current().nextBoolean()) {
-            val fine = reward + getCashReward(user.balance)
+            val fine = reward + getCashReward(abs(user.balance))
             userService.save(user.also { it.cash -= fine })
             throw BotException("You failed to be a slut and paid $fine in damages.")
         }
