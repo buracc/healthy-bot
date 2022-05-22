@@ -2,14 +2,15 @@ package com.github.buracc.healthybot.discord.handlers
 
 import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.discord.exception.CasinoException
+import com.github.buracc.healthybot.discord.helper.EmbedHelper
 import com.github.buracc.healthybot.discord.model.DiscordCommand
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import java.awt.Color
 import javax.annotation.PostConstruct
@@ -17,6 +18,9 @@ import javax.annotation.PostConstruct
 abstract class SlashCommandHandler : ListenerAdapter() {
     @Value("\${discord.bot.guild-id}")
     private lateinit var guildId: String
+
+    @Autowired
+    private lateinit var embedHelper: EmbedHelper
     private val logger = LoggerFactory.getLogger(SlashCommandHandler::class.java)
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
@@ -25,18 +29,14 @@ abstract class SlashCommandHandler : ListenerAdapter() {
 
         val sender = event.user
         logger.info("Command '${event.name}' received from ${sender.name}, ${event.options}")
-        event.deferReply().setEphemeral(command.private).queue()
 
-        var embed = EmbedBuilder()
-            .setFooter("HealthyBot")
-            .setThumbnail(jda.selfUser.avatarUrl)
+        var embed = embedHelper.builder()
 
         try {
             when (val response = command.handler(event)) {
                 is String -> {
                     embed
                         .setTitle("Casino")
-                        .setColor(Color.YELLOW)
                         .setDescription(response)
                 }
 
@@ -53,11 +53,14 @@ abstract class SlashCommandHandler : ListenerAdapter() {
             embed.setDescription(ex.message)
         } catch (ex: Exception) {
             logger.error("Command execution failed.", ex)
+            embed.setTitle("Error")
             embed.setColor(Color.RED)
             embed.setDescription("Failed to execute command. Check the logs.")
         } finally {
-            event.hook
-                .sendMessageEmbeds(embed.build())
+            val msg = embed.build()
+            event
+                .replyEmbeds(msg)
+                .setEphemeral(command.private)
                 .queue()
         }
     }
