@@ -31,12 +31,12 @@ class RouletteManager(
         if (betUser.cash <= 0) {
             throw CasinoException("Not enough cash available to bet.")
         }
+
         val betAmount = if (amount > betUser.cash) betUser.cash else amount
 
         userService.save(betUser.also { it.cash -= betAmount })
 
-        val task = future
-        if (task == null || task.isDone) {
+        if (future == null || future?.isDone == true) {
             future = executor.scheduleWithFixedDelay({
                 val result = Random.nextInt(0, 37)
                 event.replyEmbeds(embedHelper.builder("Roulette")
@@ -48,7 +48,7 @@ class RouletteManager(
                         it.cash += bet.getRewardMultiplier(result) * bet.amount
                     })
                 }
-            }, 5, 0, TimeUnit.SECONDS)
+            }, 10, 0, TimeUnit.SECONDS)
         }
     }
 }

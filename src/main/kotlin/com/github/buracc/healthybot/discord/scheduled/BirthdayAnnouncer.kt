@@ -20,7 +20,6 @@ class BirthdayAnnouncer(
 ) {
     @Scheduled(cron = "0 0 0 * * *")
     fun checkAndAnnounce() {
-        println("checking bdays")
         val bdays = mutableListOf<User>()
         val now = LocalDate.now()
         userService.findAll().forEach {
