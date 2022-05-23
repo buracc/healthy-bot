@@ -1,11 +1,14 @@
 package com.github.buracc.healthybot.discord.handlers
 
-import com.github.buracc.healthybot.discord.exception.NotFoundException
+import com.github.buracc.healthybot.discord.SettingConstants.ROULETTE_SETTING
+import com.github.buracc.healthybot.discord.exception.CasinoException
+import com.github.buracc.healthybot.discord.exception.CommandDisabledException
 import com.github.buracc.healthybot.discord.exception.UnauthorizedException
 import com.github.buracc.healthybot.discord.helper.EmbedHelper
-import com.github.buracc.healthybot.discord.helper.Utils.filterMember
+import com.github.buracc.healthybot.discord.managers.roulette.RouletteManager
 import com.github.buracc.healthybot.discord.model.DiscordCommand
 import com.github.buracc.healthybot.repository.entity.Role
+import com.github.buracc.healthybot.service.SettingService
 import com.github.buracc.healthybot.service.UserService
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
@@ -18,7 +21,9 @@ import org.springframework.stereotype.Component
 class CasinoCommandHandler(
     override val jda: JDA,
     private val userService: UserService,
-    private val embedHelper: EmbedHelper
+    private val embedHelper: EmbedHelper,
+    private val settingService: SettingService,
+    private val rouletteManager: RouletteManager
 ) : SlashCommandHandler() {
     override val commands = mapOf(
         "reset" to DiscordCommand(
@@ -26,18 +31,19 @@ class CasinoCommandHandler(
             description = "Resets the casino.",
             handler = ::reset
         ),
-        "balance" to DiscordCommand(
-            name = "balance",
-            description = "Shows your current balance.",
-            handler = ::balance,
-            options = mapOf(
-                "user" to OptionData(OptionType.STRING, "user", "Check specified user's balance.", false)
-            )
-        ),
         "top10" to DiscordCommand(
             name = "top10",
             description = "Shows the leaderboard.",
             handler = ::top10
+        ),
+        "roulette" to DiscordCommand(
+            name = "roulette",
+            description = "Place a roulette bet.",
+            handler = ::roulette,
+            options = mapOf(
+                "amount" to OptionData(OptionType.STRING, "amount", "The amount to bet.", true),
+                "space" to OptionData(OptionType.STRING, "space", "The space to bet on.", true)
+            )
         ),
     )
 
@@ -52,19 +58,6 @@ class CasinoCommandHandler(
         return "Successfully reset the casino."
     }
 
-    private fun balance(event: SlashCommandInteractionEvent): String {
-        val selectedUser = event.getOption("user")?.asString
-        val userId = if (selectedUser == null) {
-            event.user.id
-        } else {
-            event.guild?.members?.firstOrNull(filterMember(selectedUser))?.id
-                ?: throw NotFoundException("Couldn't find user: ${selectedUser}.")
-        }
-
-        val user = userService.findById(userId)
-        return "${jda.getUserById(user.discordId)?.asMention}'s balance: ${user.cash} Cash | ${user.bank} Banked"
-    }
-
     private fun top10(event: SlashCommandInteractionEvent): EmbedBuilder {
         val builder = embedHelper.builder("Casino Top 10")
 
@@ -77,5 +70,27 @@ class CasinoCommandHandler(
         }
 
         return builder
+    }
+
+    private fun roulette(event: SlashCommandInteractionEvent): String {
+        if (!settingService.getBoolean(ROULETTE_SETTING)) {
+            throw CommandDisabledException()
+        }
+        val space = event.getOption("space")?.asString ?: throw CasinoException("Invalid space entered.")
+        val amount = event.getOption("amount")?.asString
+            .run {
+                if (this == "all") {
+                    Int.MAX_VALUE
+                } else {
+                    this?.toInt()
+                }
+            }
+            ?: throw CasinoException("Invalid amount entered.")
+        if (amount < 0) {
+            throw CasinoException("Invalid amount entered.")
+        }
+
+        rouletteManager.bet(space, event.user.id, amount, event)
+        return "Placed a bet of $amount on $space."
     }
 }

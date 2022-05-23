@@ -13,4 +13,9 @@ object SettingConstants {
     const val ROB_CD = "rob_cooldown_ms"
     const val CRIME_CD = "crime_cooldown_ms"
     const val SLUT_CD = "slut_cooldown_ms"
+    const val CHAT_INCOME_MIN = "chat_income_min"
+    const val CHAT_INCOME_MAX = "chat_income_max"
+    const val ROULETTE_SETTING = "roulette_enabled"
+    const val ROULETTE_TIMER = "roulette_timer"
+    const val BDAY_CHANNEL_ID = "bday_announce_channel"
 }

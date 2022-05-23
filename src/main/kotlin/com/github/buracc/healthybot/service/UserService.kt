@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service
 class UserService(
     private val userRepository: UserRepository
 ) {
+    fun findAll() = userRepository.findAll()
+
     fun findById(id: String) = userRepository.findById(id).orElse(User(id))
 
     fun findTop10() = userRepository.findAll()

@@ -25,12 +25,14 @@ class SettingsCommandHandler(
         "settings" to DiscordCommand(
             name = "settings",
             description = "Displays the current settings.",
-            handler = ::settings
+            handler = ::settings,
+            private = true
         ),
         "set" to DiscordCommand(
             name = "set",
             description = "Used to change settings.",
             handler = ::set,
+            private = true,
             options = mapOf(
                 "key" to OptionData(OptionType.STRING, "key", "The setting to change.", true),
                 "value" to OptionData(OptionType.STRING, "value", "The value to set to.", true),

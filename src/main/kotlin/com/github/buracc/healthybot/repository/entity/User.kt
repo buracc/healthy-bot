@@ -10,6 +10,7 @@ data class User(
     var discordId: String,
     var cash: Int = 1000,
     var bank: Int = 0,
+    var birthday: String? = null,
     @Enumerated(EnumType.STRING)
     var role: Role = Role.USER,
     var robCooldown: Instant = Instant.now(),
