@@ -6,10 +6,12 @@ import com.github.buracc.healthybot.repository.entity.User
 import com.github.buracc.healthybot.service.SettingService
 import com.github.buracc.healthybot.service.UserService
 import net.dv8tion.jda.api.JDA
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
+import javax.annotation.PostConstruct
 
 @Component
 class BirthdayAnnouncer(
@@ -18,8 +20,16 @@ class BirthdayAnnouncer(
     private val userService: UserService,
     private val settingService: SettingService
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    @PostConstruct
+    fun init() {
+        checkAndAnnounce()
+    }
+
     @Scheduled(cron = "0 0 0 * * *")
     fun checkAndAnnounce() {
+        logger.info("Checking birthdays")
         val bdays = mutableListOf<User>()
         val now = LocalDate.now()
         userService.findAll().forEach {
@@ -33,11 +43,13 @@ class BirthdayAnnouncer(
                     bdays.add(it)
                 }
             } catch (e: DateTimeParseException) {
+                logger.error("Failed to parse {}'s birthday {}", it.discordId, it.birthday)
                 return@forEach
             }
         }
 
         if (bdays.isEmpty()) {
+            logger.info("No bdays today")
             return
         }
 
