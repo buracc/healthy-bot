@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
-import javax.annotation.PostConstruct
 
 @Component
 class BirthdayAnnouncer(
@@ -22,12 +21,7 @@ class BirthdayAnnouncer(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @PostConstruct
-    fun init() {
-        checkAndAnnounce()
-    }
-
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 26 0 * * *")
     fun checkAndAnnounce() {
         logger.info("Checking birthdays")
         val bdays = mutableListOf<User>()
