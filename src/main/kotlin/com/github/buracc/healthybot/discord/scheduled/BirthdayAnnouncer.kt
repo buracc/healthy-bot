@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.JDA
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 
 @Component
 class BirthdayAnnouncer(
@@ -27,9 +28,13 @@ class BirthdayAnnouncer(
                 return@forEach
             }
 
-            val date = LocalDate.parse(it.birthday)
-            if (now.dayOfMonth == date.dayOfMonth && now.monthValue == date.monthValue) {
-                bdays.add(it)
+            try {
+                val date = LocalDate.parse(it.birthday)
+                if (now.dayOfMonth == date.dayOfMonth && now.monthValue == date.monthValue) {
+                    bdays.add(it)
+                }
+            } catch (e: DateTimeParseException) {
+                return@forEach
             }
         }
 

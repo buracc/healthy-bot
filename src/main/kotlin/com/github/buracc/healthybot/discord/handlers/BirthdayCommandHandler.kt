@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import org.springframework.stereotype.Component
+import java.time.LocalDate
+import java.time.format.DateTimeParseException
 import java.util.regex.Pattern
 
 @Component
@@ -36,8 +38,13 @@ class BirthdayCommandHandler(
             throw BotException("Invalid date entered. Correct formatting: year-month-day (ex. 1990-08-17).")
         }
 
-        val user = userService.findById(event.user.id)
-        userService.save(user.also { it.birthday = date })
-        return "Successfully registered your birthday: $date"
+        try {
+            LocalDate.parse(date)
+            val user = userService.findById(event.user.id)
+            userService.save(user.also { it.birthday = date })
+            return "Successfully registered your birthday: $date"
+        } catch (e: DateTimeParseException) {
+            throw BotException("Invalid date entered. Correct formatting: year-month-day (ex. 1990-08-17).")
+        }
     }
 }
