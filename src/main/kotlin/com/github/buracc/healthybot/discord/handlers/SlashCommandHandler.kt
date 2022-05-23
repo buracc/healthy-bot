@@ -88,10 +88,10 @@ abstract class SlashCommandHandler : ListenerAdapter() {
 //            it.delete().complete()
 //        }
 
-//        commandData.forEach {
-//            logger.info("Registering command '${it.name}'")
-//            guild.upsertCommand(it).complete()
-//        }
+        commandData.forEach {
+            logger.info("Registering command '${it.name}'")
+            guild.upsertCommand(it).complete()
+        }
     }
 
     protected abstract val jda: JDA
