@@ -32,19 +32,18 @@ class BirthdayAnnouncer(
         logger.info("Checking birthdays")
         val bdays = mutableListOf<User>()
         val now = LocalDate.now()
-        userService.findAll().forEach {
-            if (it.birthday == null) {
-                return@forEach
+        for (user in userService.findAll()) {
+            if (user.birthday == null) {
+                continue
             }
 
             try {
-                val date = LocalDate.parse(it.birthday)
+                val date = LocalDate.parse(user.birthday)
                 if (now.dayOfMonth == date.dayOfMonth && now.monthValue == date.monthValue) {
-                    bdays.add(it)
+                    bdays.add(user)
                 }
             } catch (e: DateTimeParseException) {
-                logger.error("Failed to parse {}'s birthday {}", it.discordId, it.birthday)
-                return@forEach
+                logger.error("Failed to parse {}'s birthday {}", user.discordId, user.birthday)
             }
         }
 
