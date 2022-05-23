@@ -39,6 +39,7 @@ class BirthdayAnnouncer(
 
             try {
                 val date = LocalDate.parse(user.birthday)
+                logger.info("{} {} {} {}", now.dayOfMonth, now.monthValue, date.dayOfMonth, date.monthValue)
                 if (now.dayOfMonth == date.dayOfMonth && now.monthValue == date.monthValue) {
                     bdays.add(user)
                 }
