@@ -21,7 +21,7 @@ class BirthdayAnnouncer(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @Scheduled(cron = "0 26 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     fun checkAndAnnounce() {
         logger.info("Checking birthdays")
         val bdays = mutableListOf<User>()
