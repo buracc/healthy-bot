@@ -63,14 +63,6 @@ class ChatCommandListener(
             split.subList(1, split.size).toTypedArray()
         )
 
-        guild.textChannels.forEach {
-            MessageHistory.getHistoryFromBeginning(it)
-                .complete()
-                .retrievedHistory
-                .distinctBy { m -> m.member }
-
-        }
-
         when (command.command) {
             "bday" -> birthdayCommandHandler.handle(command, message)
             "settings" -> settingsCommandHandler.handle(command, message)
