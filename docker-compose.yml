@@ -2,8 +2,9 @@ version: '3'
 
 services:
   healthy-bot-db:
+    container_name: healthy-bot-db
     image: postgres:alpine
-    hostname: healthybot-db
+    hostname: healthy-bot-db
     ports:
       - "5402:5402"
     environment:
@@ -15,11 +16,11 @@ services:
     command: -p 5402
 
   healthy-bot:
+    container_name: healthy-bot
+    hostname: healthy-bot
     depends_on:
       - healthy-bot-db
     build: .
-    ports:
-      - "8080:8080"
     env_file:
       - .env
 
