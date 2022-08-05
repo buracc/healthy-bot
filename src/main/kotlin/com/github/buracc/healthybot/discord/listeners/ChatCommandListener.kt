@@ -41,6 +41,10 @@ class ChatCommandListener(
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val member = event.member ?: return
+        if (member.id == jda.selfUser.id) {
+            return
+        }
+
         val memberId = member.idLong
         val message = event.message
         val messageContent = message.contentStripped
@@ -50,9 +54,9 @@ class ChatCommandListener(
             return
         }
 
-        val first = split[0]
-        val prefix = first[0]
-        val prefixSetting = settingService.get(COMMAND_PREFIX)[0]
+        val first = split.getOrNull(0) ?: return
+        val prefix = first.getOrNull(0) ?: return
+        val prefixSetting = settingService.get(COMMAND_PREFIX).getOrNull(0) ?: return
         if (prefix != prefixSetting) {
             return
         }

@@ -7,7 +7,6 @@ import com.github.buracc.healthybot.service.SettingService
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageHistory
 import org.springframework.stereotype.Component
 
 @Component
@@ -29,13 +28,14 @@ class UserCommandHandler(
         val textChannelId = settingService.get(MAIN_TEXT_CHANNEL_ID)
         val channel = guild.getTextChannelById(textChannelId) ?: throw BotException("Channel not found.")
         val userId = command.actions.getOrNull(0) ?: throw BotException("No user id specified.")
-        val member = guild.retrieveMemberById(userId).complete() ?: throw BotException("Member not found.")
+        val member = guild.getMemberById(userId) ?: throw BotException("Member not found.")
 
-        val latestMessage = MessageHistory.getHistoryFromBeginning(channel)
-            .complete()
+        val latestMessage = channel.history
             .retrievedHistory
-            .filter { m -> m.member == member }
-            .lastOrNull() ?: return "No message found for member ${member.asMention}"
+            .also { println(it.map { y -> y.contentStripped}) }
+            .firstOrNull { m -> m.member?.id == member.id }
+
+            ?: return "No message found for member ${member.asMention}"
 
         return "${member.asMention}'s latest message was: ${latestMessage.contentStripped} at ${latestMessage.timeCreated}"
     }
