@@ -21,13 +21,14 @@ abstract class CommandHandler {
     protected lateinit var discordProperties: DiscordProperties
 
     fun <T> respond(responseHandler: () -> T, message: Message) {
-        var embed = embedHelper.builder()
+        var embed = embedHelper.builder("Healthy Bot")
+        val start = System.currentTimeMillis()
 
         try {
+
             when (val response = responseHandler.invoke()) {
                 is String -> {
                     embed
-                        .setTitle("Healthy Bot")
                         .setDescription(response)
                 }
 
@@ -35,8 +36,8 @@ abstract class CommandHandler {
                     embed = response
                 }
             }
+
         } catch (ex: BotException) {
-            embed.setTitle("Healthy Bot")
             embed.setColor(Color.RED)
             embed.setDescription(ex.message)
         } catch (ex: Exception) {
@@ -46,6 +47,7 @@ abstract class CommandHandler {
             embed.setDescription("Failed to execute command. Check the logs.")
         } finally {
             val msg = embed.build()
+            embed.setFooter("Response time: ${System.currentTimeMillis() - start} ms")
             message
                 .replyEmbeds(msg)
                 .queue()

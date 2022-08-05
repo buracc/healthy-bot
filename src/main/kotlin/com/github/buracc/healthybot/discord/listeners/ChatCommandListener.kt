@@ -1,6 +1,5 @@
 package com.github.buracc.healthybot.discord.listeners
 
-import com.github.buracc.healthybot.config.properties.DiscordProperties
 import com.github.buracc.healthybot.discord.SettingConstants.COMMAND_PREFIX
 import com.github.buracc.healthybot.discord.commands.BirthdayCommandHandler
 import com.github.buracc.healthybot.discord.commands.SettingsCommandHandler
@@ -9,7 +8,6 @@ import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.service.SettingService
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.slf4j.LoggerFactory
@@ -21,7 +19,6 @@ class ChatCommandListener(
     private val jda: JDA,
     private val guild: Guild,
     private val settingService: SettingService,
-    private val discordProperties: DiscordProperties,
     private val birthdayCommandHandler: BirthdayCommandHandler,
     private val settingsCommandHandler: SettingsCommandHandler,
     private val userCommandHandler: UserCommandHandler,
@@ -47,10 +44,9 @@ class ChatCommandListener(
 
         val memberId = member.idLong
         val message = event.message
-        val messageContent = message.contentStripped
+        val messageContent = message.contentRaw
         val split = messageContent.split(" ")
         if (split.isEmpty()) {
-            logger.warn("Message was empty")
             return
         }
 

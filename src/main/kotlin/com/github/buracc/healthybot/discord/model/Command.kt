@@ -1,9 +1,9 @@
 package com.github.buracc.healthybot.discord.model
 
 data class Command(
-        val userId: Long,
-        val command: String,
-        val actions: Array<String>
+    val userId: Long,
+    val command: String,
+    val actions: Array<String>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
