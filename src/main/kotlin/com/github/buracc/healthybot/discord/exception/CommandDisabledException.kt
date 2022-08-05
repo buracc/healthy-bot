@@ -1,3 +1,3 @@
 package com.github.buracc.healthybot.discord.exception
 
-class CommandDisabledException : CasinoException("This command is disabled.")
+class CommandDisabledException : BotException("This command is disabled.")

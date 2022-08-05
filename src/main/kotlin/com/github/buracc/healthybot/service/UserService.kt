@@ -10,11 +10,9 @@ class UserService(
 ) {
     fun findAll() = userRepository.findAll()
 
-    fun findById(id: String) = userRepository.findById(id).orElse(User(id))
+    fun findByIdOrCreate(id: Long) = findByIdOrCreate(id.toString())
 
-    fun findTop10() = userRepository.findAll()
-        .sortedByDescending { it.balance }
-        .take(10)
+    fun findByIdOrCreate(id: String) = userRepository.findById(id).orElse(User(id))
 
     fun save(user: User) = userRepository.save(user)
 

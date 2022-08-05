@@ -5,16 +5,18 @@ services:
     image: postgres:alpine
     hostname: healthybot-db
     ports:
-      - "5400:5400"
+      - "5402:5402"
     environment:
       - POSTGRES_DB=healthybot
       - POSTGRES_USER=healthybot
       - POSTGRES_PASSWORD=healthybot
     volumes:
       - healthy-bot-db:/var/lib/postgresql/data
-    command: -p 5400
+    command: -p 5402
 
   healthy-bot:
+    depends_on:
+      - healthy-bot-db
     build: .
     ports:
       - "8080:8080"

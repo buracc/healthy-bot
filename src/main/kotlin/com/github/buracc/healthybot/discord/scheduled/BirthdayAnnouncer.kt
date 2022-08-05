@@ -49,7 +49,7 @@ class BirthdayAnnouncer(
         val embed = embedHelper.builder("Birthdays")
         embed.setDescription("Appa burday to u!!!")
         bdays.forEach {
-            embed.addField(jda.getUserById(it.discordId)?.asTag, it.birthday, false)
+            embed.addField("<@${it.discordId}>", it.birthday, false)
         }
 
         jda.getTextChannelById(settingService.get(BDAY_CHANNEL_ID))
