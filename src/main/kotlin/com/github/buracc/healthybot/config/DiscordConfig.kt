@@ -1,6 +1,7 @@
 package com.github.buracc.healthybot.config
 
 import com.github.buracc.healthybot.config.properties.DiscordProperties
+import com.github.buracc.healthybot.discord.exception.BotException
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.requests.GatewayIntent
@@ -23,4 +24,8 @@ class DiscordConfig(
             .build()
             .awaitReady()
     }
+
+    @Bean
+    fun guild(jda: JDA) = jda.getGuildById(discordProperties.guildId)
+        ?: throw BotException("Guild not found")
 }

@@ -3,6 +3,7 @@ package com.github.buracc.healthybot.discord.commands
 import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.service.UserService
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
@@ -23,9 +24,25 @@ class BirthdayCommandHandler(
         respond({
             when (command.actions.getOrNull(0)) {
                 "add" -> add(command)
-                else -> "Invalid action."
+                else -> display()
             }
         }, message)
+    }
+
+    private fun display(): EmbedBuilder {
+        val embed = embedHelper.builder("Birthdays this month")
+        val now = LocalDate.now()
+        embed.setDescription("To register your birth day, do !bday year-month-day")
+        for (user in userService.findAll()) {
+            val date = user.birthDate ?: continue
+            if (now.monthValue != date.monthValue) {
+                continue
+            }
+
+            embed.addField("<@${user.discordId}>", date.toString(), false)
+        }
+
+        return embed
     }
 
     private fun add(command: Command): String {

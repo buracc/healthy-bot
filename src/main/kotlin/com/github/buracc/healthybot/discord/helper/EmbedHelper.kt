@@ -17,6 +17,6 @@ class EmbedHelper(
     fun builder(): EmbedBuilder {
         return EmbedBuilder()
             .setColor(Color.YELLOW)
-            .setFooter("HealthyBot")
+            .setFooter("Healthy Bot")
     }
 }

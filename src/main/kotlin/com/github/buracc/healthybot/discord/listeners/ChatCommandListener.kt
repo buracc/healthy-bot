@@ -4,9 +4,12 @@ import com.github.buracc.healthybot.config.properties.DiscordProperties
 import com.github.buracc.healthybot.discord.SettingConstants.COMMAND_PREFIX
 import com.github.buracc.healthybot.discord.commands.BirthdayCommandHandler
 import com.github.buracc.healthybot.discord.commands.SettingsCommandHandler
+import com.github.buracc.healthybot.discord.commands.UserCommandHandler
 import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.service.SettingService
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.slf4j.LoggerFactory
@@ -16,10 +19,12 @@ import javax.annotation.PostConstruct
 @Component
 class ChatCommandListener(
     private val jda: JDA,
+    private val guild: Guild,
     private val settingService: SettingService,
     private val discordProperties: DiscordProperties,
     private val birthdayCommandHandler: BirthdayCommandHandler,
-    private val settingsCommandHandler: SettingsCommandHandler
+    private val settingsCommandHandler: SettingsCommandHandler,
+    private val userCommandHandler: UserCommandHandler,
 ) : ListenerAdapter() {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -27,7 +32,6 @@ class ChatCommandListener(
     fun register() {
         jda.addEventListener(this)
 
-        val guild = jda.getGuildById(discordProperties.guildId) ?: return
         val guildCommands = guild.retrieveCommands().complete()
         guildCommands.forEach {
             logger.info("Deleting command '${it.name}'")
@@ -36,7 +40,8 @@ class ChatCommandListener(
     }
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        val member = event.member?.idLong ?: return
+        val member = event.member ?: return
+        val memberId = member.idLong
         val message = event.message
         val messageContent = message.contentStripped
         val split = messageContent.split(" ")
@@ -53,14 +58,23 @@ class ChatCommandListener(
         }
 
         val command = Command(
-            member,
+            memberId,
             first.substring(1),
             split.subList(1, split.size).toTypedArray()
         )
 
+        guild.textChannels.forEach {
+            MessageHistory.getHistoryFromBeginning(it)
+                .complete()
+                .retrievedHistory
+                .distinctBy { m -> m.member }
+
+        }
+
         when (command.command) {
             "bday" -> birthdayCommandHandler.handle(command, message)
             "settings" -> settingsCommandHandler.handle(command, message)
+            "user" -> userCommandHandler.handle(command, message)
         }
     }
 }

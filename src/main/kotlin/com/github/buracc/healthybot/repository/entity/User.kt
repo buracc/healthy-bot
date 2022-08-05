@@ -1,5 +1,6 @@
 package com.github.buracc.healthybot.repository.entity
 
+import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
@@ -10,4 +11,7 @@ data class User(
     var birthday: String? = null,
     @Enumerated(EnumType.STRING)
     var role: Role = Role.USER,
-)
+) {
+    val birthDate: LocalDate?
+        get() = LocalDate.parse(birthday)
+}
