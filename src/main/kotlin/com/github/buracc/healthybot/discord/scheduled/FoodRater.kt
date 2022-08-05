@@ -37,13 +37,13 @@ class FoodRater(
             val upvotes = ratings.filter { it }.size
             val downvotes = ratings.filter { !it }.size
             val ratio = upvotes.toDouble().div(downvotes)
-            val embed = embedHelper.builder("👍$upvotes 👎$downvotes")
-                .setFooter("<@${food.ownerId}>")
+            val embed = embedHelper.builder()
+                .setFooter("👍$upvotes 👎$downvotes")
                 .setImage(food.imageUrl)
             if (ratio > ratioSetting || downvotes == 0) {
                 embed
                     .setTitle("Food Heaven 🎂")
-                    .setDescription("Proppa food lads!!")
+                    .setDescription("Proppa food lads!! Well done <@${food.ownerId}>")
                 heaven.sendMessageEmbeds(embed.build()).queue()
             } else {
                 embed
