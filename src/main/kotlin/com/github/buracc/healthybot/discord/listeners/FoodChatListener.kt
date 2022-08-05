@@ -90,7 +90,7 @@ class FoodChatListener(
         }
 
         foodService.save(food)
-        event.reply("Successfully voted")
+        event.reply(if (rating.upvote == null) "Removed vote" else "Successfully voted")
             .setEphemeral(true)
             .queue()
     }
