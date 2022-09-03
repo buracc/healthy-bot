@@ -22,17 +22,18 @@ class ReminderAnnouncer(
         val reminders = reminderService.getAll()
             .filter { now >= it.remindDate.toInstant() }
 
-        val embed = embedHelper.builder("Reminders")
-        embed.setDescription("Reminder time turds")
+        if (reminders.isNotEmpty()) {
+            val embed = embedHelper.builder("Reminders")
 
-        reminders.forEach {
-            embed.addField(it.message.trim(), "<@${it.owner.discordId}>", false)
+            reminders.forEach {
+                embed.addField(it.message.trim(), "by: <@${it.owner.discordId}>", false)
+            }
+
+            jda.getTextChannelById(settingService.get(SettingConstants.MAIN_TEXT_CHANNEL_ID))
+                ?.sendMessageEmbeds(embed.build())
+                ?.queue()
+
+            reminderService.delete(reminders)
         }
-
-        jda.getTextChannelById(settingService.get(SettingConstants.MAIN_TEXT_CHANNEL_ID))
-            ?.sendMessageEmbeds(embed.build())
-            ?.queue()
-
-        reminderService.delete(reminders)
     }
 }
