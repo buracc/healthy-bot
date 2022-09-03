@@ -2,6 +2,7 @@ package com.github.buracc.healthybot.discord.listeners
 
 import com.github.buracc.healthybot.discord.SettingConstants.COMMAND_PREFIX
 import com.github.buracc.healthybot.discord.commands.BirthdayCommandHandler
+import com.github.buracc.healthybot.discord.commands.ReminderCommandHandler
 import com.github.buracc.healthybot.discord.commands.SettingsCommandHandler
 import com.github.buracc.healthybot.discord.commands.UserCommandHandler
 import com.github.buracc.healthybot.discord.model.Command
@@ -22,6 +23,7 @@ class ChatCommandListener(
     private val birthdayCommandHandler: BirthdayCommandHandler,
     private val settingsCommandHandler: SettingsCommandHandler,
     private val userCommandHandler: UserCommandHandler,
+    private val reminderCommandHandler: ReminderCommandHandler
 ) : ListenerAdapter() {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -67,6 +69,7 @@ class ChatCommandListener(
             "bday" -> birthdayCommandHandler.handle(command, message)
             "settings" -> settingsCommandHandler.handle(command, message)
             "user" -> userCommandHandler.handle(command, message)
+            "remind" -> reminderCommandHandler.handle(command, message)
         }
     }
 }
