@@ -33,7 +33,7 @@ class ReminderAnnouncer(
                 ?.sendMessageEmbeds(embed.build())
                 ?.queue()
 
-            reminderService.delete(reminders)
+            reminderService.deleteAll(reminders)
         }
     }
 }

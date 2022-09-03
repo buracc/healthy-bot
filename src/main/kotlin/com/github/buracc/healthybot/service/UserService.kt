@@ -12,7 +12,9 @@ class UserService(
 
     fun findByIdOrCreate(id: Long) = findByIdOrCreate(id.toString())
 
-    fun findByIdOrCreate(id: String) = userRepository.findById(id).orElse(User(id))
+    fun findByIdOrCreate(id: String) = userRepository.findById(id).orElseGet {
+        save(User(id))
+    }
 
     fun save(user: User) = userRepository.save(user)
 

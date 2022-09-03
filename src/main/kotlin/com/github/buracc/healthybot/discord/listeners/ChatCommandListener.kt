@@ -47,22 +47,25 @@ class ChatCommandListener(
         val memberId = member.idLong
         val message = event.message
         val messageContent = message.contentRaw
-        val split = messageContent.split(" ")
+        val split = messageContent.split(" ", "\n")
         if (split.isEmpty()) {
             return
         }
 
-        val first = split.getOrNull(0) ?: return
-        val prefix = first.getOrNull(0) ?: return
+        val commandText = split.getOrNull(0) ?: return
+        val commandPrefix = commandText.getOrNull(0) ?: return
         val prefixSetting = settingService.get(COMMAND_PREFIX).getOrNull(0) ?: return
-        if (prefix != prefixSetting) {
+        if (commandPrefix != prefixSetting) {
             return
         }
 
+        val actions = if (split.size == 1) emptyArray() else split.subList(1, split.size).toTypedArray()
+        val trimmedContent = messageContent.replace(commandText, "").trim()
         val command = Command(
             memberId,
-            first.substring(1),
-            split.subList(1, split.size).toTypedArray()
+            commandText.substring(1),
+            trimmedContent,
+            actions
         )
 
         when (command.command) {

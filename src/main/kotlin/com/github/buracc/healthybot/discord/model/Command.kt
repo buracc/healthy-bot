@@ -3,6 +3,7 @@ package com.github.buracc.healthybot.discord.model
 data class Command(
     val userId: Long,
     val command: String,
+    val messageTrimmed: String,
     val actions: Array<String>
 ) {
     override fun equals(other: Any?): Boolean {
@@ -13,6 +14,7 @@ data class Command(
 
         if (userId != other.userId) return false
         if (command != other.command) return false
+        if (messageTrimmed != other.messageTrimmed) return false
         if (!actions.contentEquals(other.actions)) return false
 
         return true
@@ -21,6 +23,7 @@ data class Command(
     override fun hashCode(): Int {
         var result = userId.hashCode()
         result = 31 * result + command.hashCode()
+        result = 31 * result + messageTrimmed.hashCode()
         result = 31 * result + actions.contentHashCode()
         return result
     }
