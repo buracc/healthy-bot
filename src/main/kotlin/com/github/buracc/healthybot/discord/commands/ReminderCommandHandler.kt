@@ -41,43 +41,43 @@ class ReminderCommandHandler(
 
     fun add(command: Command): Any {
         val user = userService.findByIdOrCreate(command.userId)
-        if (user.role != Role.ADMIN && !user.authorized) {
-            throw UnauthorizedException("You are not authorized to use this command.")
-        }
+        if (user.role == Role.ADMIN || user.authorized) {
+            val messages = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
+            if (messages.isEmpty()) {
+                val embed = embedHelper.builder("Reminders")
+                val reminders = reminderService.getAllByOwner(user)
+                val now = ZonedDateTime.now()
+                embed.setFooter(
+                    "Reminder example: !remind ${now.format(ReminderService.format)} f1 time turds"
+                )
 
-        val messages = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
-        if (messages.isEmpty()) {
-            val embed = embedHelper.builder("Reminders")
-            val reminders = reminderService.getAllByOwner(user)
-            val now = ZonedDateTime.now()
-            embed.setFooter(
-                "Reminder example: !remind ${now.format(ReminderService.format)} f1 time turds"
-            )
+                if (reminders.isEmpty()) {
+                    embed.setDescription("You do not have any reminders set.")
+                    return embed
+                }
 
-            if (reminders.isEmpty()) {
-                embed.setDescription("You do not have any reminders set.")
+                for (reminder in reminders) {
+                    embed.addField(
+                        "#${reminder.id}. ${reminder.message.trim()}",
+                        reminder.remindDateString,
+                        false
+                    )
+                }
+
                 return embed
             }
 
-            for (reminder in reminders) {
-                embed.addField(
-                    "#${reminder.id}. ${reminder.message.trim()}",
-                    reminder.remindDateString,
-                    false
-                )
+            var created = 0
+            for (msg in messages) {
+                val actions = msg.split(" ")
+                val datetime = "${actions[0]} ${actions[1]} ${actions[2]}"
+                val message = actions.toList().subList(3, actions.size).joinToString(" ")
+                reminderService.add(datetime, message, user).let { created++ }
             }
 
-            return embed
+            return "Created $created reminders."
         }
 
-        var created = 0
-        for (msg in messages) {
-            val actions = msg.split(" ")
-            val datetime = "${actions[0]} ${actions[1]} ${actions[2]}"
-            val message = actions.toList().subList(3, actions.size).joinToString(" ")
-            reminderService.add(datetime, message, user).let { created++ }
-        }
-
-        return "Created $created reminders."
+        throw UnauthorizedException("You are not authorized to use this command.")
     }
 }
