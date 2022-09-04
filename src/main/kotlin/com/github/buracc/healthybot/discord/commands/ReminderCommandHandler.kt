@@ -9,7 +9,6 @@ import com.github.buracc.healthybot.service.UserService
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 @Component
