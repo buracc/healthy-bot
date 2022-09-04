@@ -36,11 +36,11 @@ class UserCommandHandler(
         }
 
         val userId = command.actions.getOrNull(0) ?: throw BotException("No user id specified.")
-        val member = guild.getMemberById(userId) ?: throw BotException("Member not found.")
+        val member = userService.findByIdOrCreate(userId) ?: throw BotException("Member not found.")
 
-        userService.save(user.also { it.authorized = !it.authorized })
+        userService.save(member.also { it.authorized = !it.authorized })
 
-        return "${member.asMention} is ${if (user.authorized) "now" else "no longer"} authorized to use commands."
+        return "<@${member.discordId}> is ${if (member.authorized) "now" else "no longer"} authorized to use commands."
     }
 
     private fun latestMessage(command: Command): String {
