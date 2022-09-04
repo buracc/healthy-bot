@@ -42,8 +42,8 @@ class ReminderCommandHandler(
 
     fun add(command: Command): Any {
         val user = userService.findByIdOrCreate(command.userId)
-        if (user.role != Role.ADMIN) {
-            throw UnauthorizedException("You are not authorized to add reminders.")
+        if (user.role != Role.ADMIN && !user.authorized) {
+            throw UnauthorizedException("You are not authorized to use this command.")
         }
 
         val messages = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }

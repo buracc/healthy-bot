@@ -9,6 +9,7 @@ data class User(
     @Id
     var discordId: String,
     var birthday: String? = null,
+    var authorized: Boolean = false,
     @Enumerated(EnumType.STRING)
     var role: Role = Role.USER,
 ) {

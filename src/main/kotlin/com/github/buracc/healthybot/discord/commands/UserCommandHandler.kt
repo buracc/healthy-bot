@@ -19,9 +19,17 @@ class UserCommandHandler(
         respond({
             when (command.actions.getOrNull(1)) {
                 "latest_message" -> latestMessage(command)
+                "authorize" -> authorize(command)
                 else -> "Invalid action."
             }
         }, message)
+    }
+
+    private fun authorize(command: Command): String {
+        val userId = command.actions.getOrNull(0) ?: throw BotException("No user id specified.")
+        val member = guild.getMemberById(userId) ?: throw BotException("Member not found.")
+
+        return "${member.asMention} is now authorized to use commands."
     }
 
     private fun latestMessage(command: Command): String {
