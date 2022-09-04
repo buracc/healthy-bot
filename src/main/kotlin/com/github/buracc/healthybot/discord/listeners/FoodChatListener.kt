@@ -54,10 +54,9 @@ class FoodChatListener(
             return
         }
 
-        message.delete().queue()
-
         val attachment = message.attachments.firstOrNull()
         if (attachment == null || !attachment.isImage) {
+            message.delete().queue()
             return
         }
 
@@ -70,6 +69,7 @@ class FoodChatListener(
             .append(attachment.url)
             .build()
         channel.sendMessage(send).queue()
+        message.delete().queue()
     }
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {

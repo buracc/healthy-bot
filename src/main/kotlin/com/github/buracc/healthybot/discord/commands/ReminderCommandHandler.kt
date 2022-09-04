@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @Component
 class ReminderCommandHandler(
@@ -49,19 +50,20 @@ class ReminderCommandHandler(
         if (messages.isEmpty()) {
             val embed = embedHelper.builder("Reminders")
             val reminders = reminderService.getAllByOwner(user)
-            val now = LocalDateTime.now()
+            val now = ZonedDateTime.now()
             embed.setFooter(
-                "Reminder example: !remind ${now.dayOfMonth}-${now.monthValue}-${now.year} ${now.hour}:${now.minute} +02:00 f1 time turds"
+                "Reminder example: !remind ${now.format(ReminderService.format)} f1 time turds"
             )
 
             if (reminders.isEmpty()) {
-                return "You do not have any reminders set."
+                embed.setDescription("You do not have any reminders set.")
+                return embed
             }
 
             for (reminder in reminders) {
                 embed.addField(
-                    "#${reminder.id}. ${reminder.message.trim()} (${reminder.remindDate.format(ReminderService.format)})",
-                    "by: <@${reminder.owner.discordId}>",
+                    "#${reminder.id}. ${reminder.message.trim()}",
+                    reminder.remindDateString,
                     false
                 )
             }

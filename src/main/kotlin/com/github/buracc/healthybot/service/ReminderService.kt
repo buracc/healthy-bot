@@ -42,7 +42,7 @@ class ReminderService(
 
             val reminder = Reminder(
                 message = message,
-                remindDate = dateTime,
+                remindDateString = time,
                 owner = user
             )
             return reminderRepository.save(reminder)
