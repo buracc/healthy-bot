@@ -45,14 +45,15 @@ class ReminderCommandHandler(
             val messages = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
             if (messages.isEmpty()) {
                 val embed = embedHelper.builder("Reminders")
-                val reminders = reminderService.getAllByOwner(user)
+                val reminders = if (command.command == "reminders") reminderService.getAll() else
+                    reminderService.getAllByOwner(user)
                 val now = ZonedDateTime.now()
                 embed.setFooter(
                     "Reminder example: !remind ${now.format(ReminderService.format)} f1 time turds"
                 )
 
                 if (reminders.isEmpty()) {
-                    embed.setDescription("You do not have any reminders set.")
+                    embed.setDescription("No reminders found.")
                     return embed
                 }
 

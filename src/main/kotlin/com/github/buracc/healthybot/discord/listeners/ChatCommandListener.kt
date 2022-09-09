@@ -72,7 +72,7 @@ class ChatCommandListener(
             "bday" -> birthdayCommandHandler.handle(command, message)
             "settings" -> settingsCommandHandler.handle(command, message)
             "user" -> userCommandHandler.handle(command, message)
-            "remind" -> reminderCommandHandler.handle(command, message)
+            "remind", "reminder", "reminders" -> reminderCommandHandler.handle(command, message)
         }
     }
 }

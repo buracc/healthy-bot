@@ -20,7 +20,7 @@ class ReminderService(
         val format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm z")
     }
 
-    fun getAll() = reminderRepository.findAll()
+    fun getAll() = reminderRepository.findAll().toList()
 
     fun getById(id: Long) = reminderRepository.findById(id)
         .orElseThrow { UnauthorizedException("Reminder not found.") }
