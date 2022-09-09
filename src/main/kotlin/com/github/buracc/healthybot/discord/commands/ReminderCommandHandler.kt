@@ -57,7 +57,7 @@ class ReminderCommandHandler(
                     return embed
                 }
 
-                for (reminder in reminders) {
+                for (reminder in reminders.sortedBy { it.remindDate }) {
                     embed.addField(
                         "#${reminder.id}. ${reminder.message.trim()}",
                         reminder.remindDateString,
