@@ -12,7 +12,7 @@ data class Food(
     var id: Long? = null,
     var messageId: String? = null,
     val ownerId: String,
-    val imageUrl: String,
+    var imageUrl: String? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "food_id")
     val ratings: MutableList<FoodRating> = mutableListOf(),

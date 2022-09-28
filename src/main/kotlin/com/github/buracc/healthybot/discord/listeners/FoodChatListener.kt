@@ -1,7 +1,6 @@
 package com.github.buracc.healthybot.discord.listeners
 
 import com.github.buracc.healthybot.discord.SettingConstants.FOOD_CHANNEL_ID
-import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.repository.entity.Food
 import com.github.buracc.healthybot.repository.entity.FoodRating
 import com.github.buracc.healthybot.service.FoodService
@@ -14,6 +13,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import org.springframework.stereotype.Component
+import java.net.URL
 import javax.annotation.PostConstruct
 
 @Component
@@ -44,7 +44,7 @@ class FoodChatListener(
                 it.messageId = message.id
             })
             message
-                .editMessage(postedFood.imageUrl)
+                .editMessage("Vote lads")
                 .setActionRow(
                     Button.primary("upvote", Emoji.fromUnicode("U+2B06")),
                     Button.primary("downvote", Emoji.fromUnicode("U+2B07")),
@@ -60,15 +60,24 @@ class FoodChatListener(
             return
         }
 
-        val food = foodService.save(Food(
-            ownerId = member.id,
-            imageUrl = attachment.url
-        ))
+        val food = foodService.save(
+            Food(
+                ownerId = member.id,
+                imageUrl = attachment.url
+            )
+        )
+
         val send = MessageBuilder()
             .append("${food.id} ")
-            .append(attachment.url)
+            .append("attachment://image.png")
             .build()
-        channel.sendMessage(send).queue()
+
+        val image = URL(attachment.url).readBytes()
+
+        channel.sendMessage(send)
+            .addFile(image, "image.png")
+            .queue { food.imageUrl = it.attachments.firstOrNull()?.url }
+
         message.delete().queue()
     }
 
