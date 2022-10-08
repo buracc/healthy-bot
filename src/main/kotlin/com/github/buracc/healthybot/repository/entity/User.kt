@@ -14,5 +14,5 @@ data class User(
     var role: Role = Role.USER,
 ) {
     val birthDate: LocalDate?
-        get() = LocalDate.parse(birthday)
+        get() = if (birthday == null) null else LocalDate.parse(birthday)
 }
