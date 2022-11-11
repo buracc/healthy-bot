@@ -24,7 +24,7 @@ services:
     env_file:
       - .env
     volumes:
-      - healthy-bot:/
+      - healthy-bot:/home/healthybot
 
 volumes:
   healthy-bot-db:
