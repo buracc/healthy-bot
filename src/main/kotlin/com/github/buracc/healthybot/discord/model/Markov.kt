@@ -2,10 +2,8 @@ package com.github.buracc.healthybot.discord.model
 
 data class Markov(private val chain: MutableMap<String, MutableList<String>> = mutableMapOf()) {
     fun addPhrase(text: String, minWords: Int = 3) {
-        println("Adding phrase: $text")
         val words = text.split(' ')
         if (words.size < minWords) {
-            println("Phrase has less words than the minimum of $minWords")
             return
         }
 
@@ -42,6 +40,6 @@ data class Markov(private val chain: MutableMap<String, MutableList<String>> = m
             phrase += word
         }
 
-        return phrase.joinToString(" ").also { println("Generated Markov chain: $it") }
+        return phrase.joinToString(" ")
     }
 }

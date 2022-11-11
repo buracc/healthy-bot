@@ -26,7 +26,6 @@ class MarkovCommandHandler(
     }
 
     fun markov(command: Command): NoEmbed {
-        println(command.actions)
         val userId = command.actions.getOrNull(1)?.replace("\\D".toRegex(), "") ?: command.userId.toString()
         return NoEmbed(markovRepository.get(userId) ?: "Crack cocaine")
     }
