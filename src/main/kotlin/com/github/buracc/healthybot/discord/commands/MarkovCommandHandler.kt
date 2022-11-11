@@ -25,7 +25,8 @@ class MarkovCommandHandler(
     }
 
     fun markov(command: Command): String {
+        println(command.actions)
         val userId = command.actions.getOrNull(1)?.replace("\\D".toRegex(), "") ?: command.userId.toString()
-        return "<@${userId}>: ${markovRepository.get(userId)  ?: "Crack cocaine"}"
+        return markovRepository.get(userId) ?: "Crack cocaine"
     }
 }

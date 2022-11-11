@@ -4,6 +4,7 @@ import com.github.buracc.healthybot.config.properties.DiscordProperties
 import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.discord.helper.EmbedHelper
 import com.github.buracc.healthybot.discord.model.Command
+import com.github.buracc.healthybot.discord.model.NoEmbed
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
@@ -21,15 +22,18 @@ abstract class CommandHandler {
     protected lateinit var discordProperties: DiscordProperties
 
     fun <T> respond(responseHandler: () -> T, message: Message) {
-        var embed = embedHelper.builder("Healthy Bot")
+        var embed: EmbedBuilder? = embedHelper.builder("Healthy Bot")
         val start = System.currentTimeMillis()
 
         try {
-
             when (val response = responseHandler.invoke()) {
                 is String -> {
-                    embed
-                        .setDescription(response)
+                    embed?.setDescription(response)
+                }
+
+                is NoEmbed -> {
+                    embed = null
+                    message.reply(response.text).queue()
                 }
 
                 is EmbedBuilder -> {
@@ -38,19 +42,21 @@ abstract class CommandHandler {
             }
 
         } catch (ex: BotException) {
-            embed.setColor(Color.RED)
-            embed.setDescription(ex.message)
+            embed?.setColor(Color.RED)
+            embed?.setDescription(ex.message)
         } catch (ex: Exception) {
             logger.error("Command execution failed.", ex)
-            embed.setTitle("Error")
-            embed.setColor(Color.RED)
-            embed.setDescription("Failed to execute command. Check the logs.")
+            embed?.setTitle("Error")
+            embed?.setColor(Color.RED)
+            embed?.setDescription("Failed to execute command. Check the logs.")
         } finally {
-            val msg = embed.build()
-            embed.setFooter("Response time: ${System.currentTimeMillis() - start} ms")
-            message
-                .replyEmbeds(msg)
-                .queue()
+            if (embed != null) {
+                val msg = embed.build()
+                embed.setFooter("Response time: ${System.currentTimeMillis() - start} ms")
+                message
+                    .replyEmbeds(msg)
+                    .queue()
+            }
         }
     }
 
