@@ -18,10 +18,9 @@ class MarkovRepository(
 ) {
     private val gson = GsonBuilder().enableComplexMapKeySerialization().create()
     private var lastSave = 0L
-    private var storageFile = File("markovs.json")
+    private var storageFile = File("/home/healthybot/markovs")
     private var markovs = if (storageFile.exists()) {
-        val json = ungzip(storageFile.readBytes())
-        gson.fromJson(json, TypeToken.getParameterized(MutableMap::class.java, String::class.java, Markov::class.java).type)
+        gson.fromJson(storageFile.readText(), TypeToken.getParameterized(MutableMap::class.java, String::class.java, Markov::class.java).type)
     } else {
         mutableMapOf<String, Markov>()
     }
@@ -49,7 +48,7 @@ class MarkovRepository(
 
         if (System.currentTimeMillis() - lastSave > TimeUnit.MINUTES.toMillis(15)) {
             val json = gson.toJson(markovs)
-            storageFile.writeBytes(gzip(json))
+            storageFile.writeText(json)
             lastSave = System.currentTimeMillis()
         }
     }
@@ -59,11 +58,11 @@ class MarkovRepository(
         return if (capitalized.lastOrNull() in setOf('.', '?', '!')) capitalized else "$capitalized."
     }
 
-    private fun gzip(content: String): ByteArray {
-        val bos = ByteArrayOutputStream()
-        GZIPOutputStream(bos).bufferedWriter().use { it.write(content) }
-        return bos.toByteArray()
-    }
+//    private fun gzip(content: String): ByteArray {
+//        val bos = ByteArrayOutputStream()
+//        GZIPOutputStream(bos).bufferedWriter().use { it.write(content) }
+//        return bos.toByteArray()
+//    }
 
-    private fun ungzip(content: ByteArray) = GZIPInputStream(content.inputStream()).bufferedReader().use { it.readText() }
+//    private fun ungzip(content: ByteArray) = GZIPInputStream(content.inputStream()).bufferedReader().use { it.readText() }
 }
