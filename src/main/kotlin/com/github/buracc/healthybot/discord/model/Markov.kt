@@ -1,7 +1,7 @@
 package com.github.buracc.healthybot.discord.model
 
 data class Markov(private val chain: MutableMap<String, MutableList<String>> = mutableMapOf()) {
-    fun addPhrase(text: String, minWords: Int = 4) {
+    fun addPhrase(text: String, minWords: Int = 3) {
         println("Adding phrase: $text")
         val words = text.split(' ')
         if (words.size < minWords) {
