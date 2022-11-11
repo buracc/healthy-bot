@@ -1,11 +1,9 @@
 package com.github.buracc.healthybot.discord.listeners
 
 import com.github.buracc.healthybot.discord.SettingConstants.COMMAND_PREFIX
-import com.github.buracc.healthybot.discord.commands.BirthdayCommandHandler
-import com.github.buracc.healthybot.discord.commands.ReminderCommandHandler
-import com.github.buracc.healthybot.discord.commands.SettingsCommandHandler
-import com.github.buracc.healthybot.discord.commands.UserCommandHandler
+import com.github.buracc.healthybot.discord.commands.*
 import com.github.buracc.healthybot.discord.model.Command
+import com.github.buracc.healthybot.repository.MarkovRepository
 import com.github.buracc.healthybot.service.SettingService
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
@@ -23,7 +21,9 @@ class ChatCommandListener(
     private val birthdayCommandHandler: BirthdayCommandHandler,
     private val settingsCommandHandler: SettingsCommandHandler,
     private val userCommandHandler: UserCommandHandler,
-    private val reminderCommandHandler: ReminderCommandHandler
+    private val reminderCommandHandler: ReminderCommandHandler,
+    private val markovCommandHandler: MarkovCommandHandler,
+    private val markovRepository: MarkovRepository
 ) : ListenerAdapter() {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -47,6 +47,9 @@ class ChatCommandListener(
         val memberId = member.idLong
         val message = event.message
         val messageContent = message.contentRaw
+
+        markovRepository.store(member.id, messageContent)
+
         val split = messageContent.split(" ", "\n")
         if (split.isEmpty()) {
             return
@@ -73,6 +76,7 @@ class ChatCommandListener(
             "settings" -> settingsCommandHandler.handle(command, message)
             "user" -> userCommandHandler.handle(command, message)
             "remind", "reminder", "reminders" -> reminderCommandHandler.handle(command, message)
+            "markov" -> markovCommandHandler.handle(command, message)
         }
     }
 }
