@@ -5,5 +5,5 @@ RUN chmod +x gradlew && ./gradlew bootJar --no-daemon
 
 FROM openjdk:17
 COPY --from=build /home/healthybot/build/libs/*.jar /home/healthybot/bot.jar
-WORKDIR
+WORKDIR /home/healthybot
 ENTRYPOINT java -jar bot.jar
