@@ -55,7 +55,9 @@ class MarkovRepository(
     }
 
     private fun formatContent(content: String): String {
-        val capitalized = content.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        val capitalized = content
+            .replace("<@\\d*>".toRegex(), "")
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         return if (capitalized.lastOrNull() in setOf('.', '?', '!')) capitalized else "$capitalized."
     }
 

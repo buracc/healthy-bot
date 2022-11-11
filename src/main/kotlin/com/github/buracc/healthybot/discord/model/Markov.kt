@@ -18,10 +18,12 @@ data class Markov(private val chain: MutableMap<String, MutableList<String>> = m
                         suffix += words[index + 1]
                     }
                 }
+
                 words.lastIndex -> {
                     val ends = chain.getOrPut("_end") { mutableListOf() }
                     ends += word
                 }
+
                 else -> {
                     val suffix = chain.getOrPut(word) { mutableListOf() }
                     suffix += words[index + 1]
@@ -40,6 +42,6 @@ data class Markov(private val chain: MutableMap<String, MutableList<String>> = m
             phrase += word
         }
 
-        return phrase.joinToString(" ")
+        return phrase.filter { !it.matches("<@\\d*>".toRegex()) }.joinToString(" ")
     }
 }
