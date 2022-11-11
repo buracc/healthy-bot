@@ -1,6 +1,7 @@
 package com.github.buracc.healthybot.discord.commands
 
 import com.github.buracc.healthybot.discord.model.Command
+import com.github.buracc.healthybot.discord.model.NoEmbed
 import com.github.buracc.healthybot.repository.MarkovRepository
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
@@ -24,9 +25,9 @@ class MarkovCommandHandler(
         return markovRepository.purge(command.userId.toString()) ?: "Weed xD"
     }
 
-    fun markov(command: Command): String {
+    fun markov(command: Command): NoEmbed {
         println(command.actions)
         val userId = command.actions.getOrNull(1)?.replace("\\D".toRegex(), "") ?: command.userId.toString()
-        return markovRepository.get(userId) ?: "Crack cocaine"
+        return NoEmbed(markovRepository.get(userId) ?: "Crack cocaine")
     }
 }
