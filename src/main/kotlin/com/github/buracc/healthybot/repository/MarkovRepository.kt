@@ -18,7 +18,7 @@ class MarkovRepository(
 ) {
     private val gson = GsonBuilder().enableComplexMapKeySerialization().create()
     private var lastSave = 0L
-    private var storageFile = File("markovs")
+    private var storageFile = File("/healthybot/data/markovs")
     private var markovs = if (storageFile.exists()) {
         val json = ungzip(storageFile.readBytes())
         gson.fromJson(json, TypeToken.getParameterized(MutableMap::class.java, String::class.java, Markov::class.java).type)
