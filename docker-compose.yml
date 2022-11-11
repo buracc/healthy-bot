@@ -23,6 +23,9 @@ services:
     build: .
     env_file:
       - .env
+    volumes:
+      - healthy-bot:/
 
 volumes:
   healthy-bot-db:
+  healthy-bot:
