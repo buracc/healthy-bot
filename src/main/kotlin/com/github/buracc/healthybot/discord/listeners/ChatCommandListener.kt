@@ -71,8 +71,6 @@ class ChatCommandListener(
             actions
         )
 
-        println("Command received $command")
-
         when (command.command) {
             "bday" -> birthdayCommandHandler.handle(command, message)
             "settings" -> settingsCommandHandler.handle(command, message)
