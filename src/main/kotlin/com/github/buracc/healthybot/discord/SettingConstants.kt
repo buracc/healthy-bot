@@ -9,4 +9,5 @@ object SettingConstants {
     const val FOOD_HELL_CHANNEL_ID = "food_hell_channel"
     const val FOOD_VOTE_PERIOD = "food_vote_period_mins"
     const val FOOD_VOTE_RATIO = "food_vote_ratio"
+    const val MARKOV_COOLDOWN_SEC = "markov_cooldown_seconds"
 }
