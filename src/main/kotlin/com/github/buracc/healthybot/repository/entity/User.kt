@@ -1,7 +1,7 @@
 package com.github.buracc.healthybot.repository.entity
 
 import java.time.LocalDate
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "users")

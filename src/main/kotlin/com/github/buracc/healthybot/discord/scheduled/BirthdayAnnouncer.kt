@@ -26,20 +26,19 @@ class BirthdayAnnouncer(
         logger.info("Checking birthdays")
         val bdays = mutableListOf<User>()
         val now = LocalDate.now()
-        for (user in userService.findAll()) {
-            if (user.birthday == null) {
-                continue
-            }
 
-            try {
-                val date = LocalDate.parse(user.birthday)
-                if (now.dayOfMonth == date.dayOfMonth && now.monthValue == date.monthValue) {
-                    bdays.add(user)
+        userService.findAll()
+            .filter { it.birthday != null }
+            .forEach {
+                try {
+                    val date = LocalDate.parse(it.birthday)
+                    if (now.dayOfMonth == date.dayOfMonth && now.monthValue == date.monthValue) {
+                        bdays.add(it)
+                    }
+                } catch (e: DateTimeParseException) {
+                    logger.error("Failed to parse {}'s birthday {}", it.discordId, it.birthday)
                 }
-            } catch (e: DateTimeParseException) {
-                logger.error("Failed to parse {}'s birthday {}", user.discordId, user.birthday)
             }
-        }
 
         if (bdays.isEmpty()) {
             logger.info("No bdays today")
@@ -49,7 +48,7 @@ class BirthdayAnnouncer(
         val embed = embedHelper.builder("Birthdays")
         embed.setDescription("Appa burday to u!!!")
         bdays.forEach {
-            embed.addField("<@${it.discordId}>", it.birthday, false)
+            embed.addField("<@${it.discordId}>", it.birthday ?: return@forEach, false)
         }
 
         jda.getTextChannelById(settingService.get(BDAY_CHANNEL_ID))

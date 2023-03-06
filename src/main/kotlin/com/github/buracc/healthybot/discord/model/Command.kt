@@ -5,6 +5,7 @@ data class Command(
     val command: String,
     val messageTrimmed: String,
     val actions: Array<String>,
+    val channelId: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

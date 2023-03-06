@@ -10,7 +10,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @Service
 class ReminderService(

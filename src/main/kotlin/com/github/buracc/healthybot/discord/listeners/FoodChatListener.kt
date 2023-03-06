@@ -6,15 +6,16 @@ import com.github.buracc.healthybot.repository.entity.FoodRating
 import com.github.buracc.healthybot.service.FoodService
 import com.github.buracc.healthybot.service.SettingService
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.MessageBuilder
-import net.dv8tion.jda.api.entities.Emoji
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import org.springframework.stereotype.Component
 import java.net.URL
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
+import net.dv8tion.jda.api.entities.emoji.Emoji
+import net.dv8tion.jda.api.utils.FileUpload
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 
 @Component
 class FoodChatListener(
@@ -30,7 +31,7 @@ class FoodChatListener(
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val member = event.member ?: return
         val message = event.message
-        val channel = message.textChannel
+        val channel = message.channel
         if (channel.id != settingService.get(FOOD_CHANNEL_ID)) {
             return
         }
@@ -67,15 +68,15 @@ class FoodChatListener(
             )
         )
 
-        val send = MessageBuilder()
-            .append("${food.id} ")
-            .append("attachment://image.png")
+        val send = MessageCreateBuilder()
+            .addContent("${food.id} ")
+            .addContent("attachment://image.png")
             .build()
 
         val image = URL(attachment.url).readBytes()
 
         channel.sendMessage(send)
-            .addFile(image, "image.png")
+            .addFiles(FileUpload.fromData(image, "image.png"))
             .queue { food.imageUrl = it.attachments.firstOrNull()?.url }
 
         message.delete().queue()

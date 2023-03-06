@@ -9,6 +9,7 @@ import com.github.buracc.healthybot.discord.helper.EmbedHelper
 import com.github.buracc.healthybot.service.FoodService
 import com.github.buracc.healthybot.service.SettingService
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.utils.FileUpload
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.net.URL
@@ -33,7 +34,7 @@ class FoodRater(
         val heaven = guild.getTextChannelById(settingService.get(FOOD_HEAVEN_CHANNEL_ID)) ?: return
         val submissionChannel = guild.getTextChannelById(settingService.get(FOOD_CHANNEL_ID)) ?: return
 
-        for (food in nonRatedFoods) {
+        nonRatedFoods.forEach { food ->
             food.canVote = false
             val ratings = food.ratings.mapNotNull { it.upvote }
             val upvotes = ratings.filter { it }.size
@@ -44,13 +45,13 @@ class FoodRater(
                 .setFooter("👍$upvotes 👎$downvotes")
                 .setImage("attachment://image.png")
 
-            if (ratio > ratioSetting || downvotes == 0) {
+            if ((ratio > ratioSetting || downvotes == 0) && upvotes > 0) {
                 embed
                     .setTitle("Food Heaven 🎂")
                     .setDescription("Proppa food lads!! Well done <@${food.ownerId}>")
                 heaven
                     .sendMessageEmbeds(embed.build())
-                    .addFile(image, "image.png")
+                    .addFiles(FileUpload.fromData(image, "image.png"))
                     .queue()
             } else {
                 embed
@@ -58,7 +59,7 @@ class FoodRater(
                     .setDescription("Shit food, <@${food.ownerId}> wtf is this dog food")
                 hell
                     .sendMessageEmbeds(embed.build())
-                    .addFile(image, "image.png")
+                    .addFiles(FileUpload.fromData(image, "image.png"))
                     .queue()
             }
 

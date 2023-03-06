@@ -9,21 +9,21 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @Configuration
 @EnableConfigurationProperties(DiscordProperties::class)
+@EnableScheduling
 class DiscordConfig(
     private val discordProperties: DiscordProperties
 ) {
     @Bean
-    fun jda(): JDA {
-        return JDABuilder
-            .createDefault(discordProperties.token)
-            .enableIntents(GatewayIntent.GUILD_MEMBERS)
-            .setMemberCachePolicy(MemberCachePolicy.ALL)
-            .build()
-            .awaitReady()
-    }
+    fun jda() = JDABuilder
+        .createDefault(discordProperties.token)
+        .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
+        .setMemberCachePolicy(MemberCachePolicy.ALL)
+        .build()
+        .awaitReady()
 
     @Bean
     fun guild(jda: JDA) = jda.getGuildById(discordProperties.guildId)

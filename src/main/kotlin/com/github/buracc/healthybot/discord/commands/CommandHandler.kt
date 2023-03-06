@@ -3,10 +3,12 @@ package com.github.buracc.healthybot.discord.commands
 import com.github.buracc.healthybot.config.properties.DiscordProperties
 import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.discord.helper.EmbedHelper
+import com.github.buracc.healthybot.discord.helper.Utils
 import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.discord.model.NoEmbed
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +16,9 @@ import java.awt.Color
 
 abstract class CommandHandler {
     private val logger = LoggerFactory.getLogger(CommandHandler::class.java)
+
+    @Autowired
+    protected lateinit var guild: Guild
 
     @Autowired
     protected lateinit var embedHelper: EmbedHelper
@@ -33,7 +38,15 @@ abstract class CommandHandler {
 
                 is NoEmbed -> {
                     embed = null
-                    message.reply(response.text).queue()
+                    val text = response.text
+                    if (text.length > 2000) {
+                        Utils.truncateText(text).forEach { msg ->
+                            guild.getTextChannelById(message.channel.id)
+                                ?.sendMessage(msg)
+                        }
+                    } else {
+                        message.reply(response.text).queue()
+                    }
                 }
 
                 is EmbedBuilder -> {

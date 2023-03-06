@@ -2,7 +2,7 @@ package com.github.buracc.healthybot.repository.entity
 
 import com.github.buracc.healthybot.service.ReminderService
 import java.time.ZonedDateTime
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class Reminder(

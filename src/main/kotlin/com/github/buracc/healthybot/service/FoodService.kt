@@ -4,7 +4,7 @@ import com.github.buracc.healthybot.discord.exception.NotFoundException
 import com.github.buracc.healthybot.repository.FoodRepository
 import com.github.buracc.healthybot.repository.entity.Food
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @Service
 class FoodService(

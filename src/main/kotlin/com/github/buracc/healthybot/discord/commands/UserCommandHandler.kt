@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component
 @Component
 class UserCommandHandler(
     override val jda: JDA,
-    private val guild: Guild,
     private val settingService: SettingService,
     private val userService: UserService
 ) : CommandHandler() {

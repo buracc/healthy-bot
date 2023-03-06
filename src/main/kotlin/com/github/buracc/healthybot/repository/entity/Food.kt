@@ -3,7 +3,7 @@ package com.github.buracc.healthybot.repository.entity
 import org.hibernate.annotations.CreationTimestamp
 import org.springframework.data.jpa.repository.Temporal
 import java.time.Instant
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class Food(

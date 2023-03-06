@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @Component
 class ChatCommandListener(
@@ -23,7 +23,8 @@ class ChatCommandListener(
     private val userCommandHandler: UserCommandHandler,
     private val reminderCommandHandler: ReminderCommandHandler,
     private val markovCommandHandler: MarkovCommandHandler,
-    private val markovRepository: MarkovRepository
+    private val markovRepository: MarkovRepository,
+    private val aiCommandHandler: AICommandHandler
 ) : ListenerAdapter() {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -48,7 +49,7 @@ class ChatCommandListener(
         val message = event.message
         val messageContent = message.contentRaw
 
-        markovRepository.store(member.id, messageContent)
+        storeMarkovMessage(member.id, messageContent)
 
         val split = messageContent.split(" ", "\n")
         if (split.isEmpty()) {
@@ -68,7 +69,8 @@ class ChatCommandListener(
             memberId,
             commandText.substring(1),
             trimmedContent,
-            actions
+            actions,
+            message.guildChannel.id
         )
 
         when (command.command) {
@@ -77,6 +79,11 @@ class ChatCommandListener(
             "user" -> userCommandHandler.handle(command, message)
             "remind", "reminder", "reminders" -> reminderCommandHandler.handle(command, message)
             "markov" -> markovCommandHandler.handle(command, message)
+            "ai" -> aiCommandHandler.handle(command, message)
         }
+    }
+
+    private fun storeMarkovMessage(userId: String, message: String) {
+//        markovRepository.store(userId, message)
     }
 }

@@ -10,4 +10,5 @@ object SettingConstants {
     const val FOOD_VOTE_PERIOD = "food_vote_period_mins"
     const val FOOD_VOTE_RATIO = "food_vote_ratio"
     const val MARKOV_COOLDOWN_SEC = "markov_cooldown_seconds"
+    const val AI_COOLDOWN_SEC = "ai_cooldown_seconds"
 }
