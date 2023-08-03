@@ -25,9 +25,7 @@ class OpenAIClient(
             "/completions",
             TextRequest(
                 model = model,
-                prompt = """you are rudeAI, you respond to prompts with a negative and downright disrespectful attitude, throwing insults and slurs wherever possible, but you still attempt to answer any questions to the best of your ability.
-User: $text
-rudeAI: """,
+                prompt = text,
                 user = discordId
             ),
             TextResponse::class.java
