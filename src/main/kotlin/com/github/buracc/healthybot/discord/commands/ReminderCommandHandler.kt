@@ -41,37 +41,37 @@ class ReminderCommandHandler(
 
     fun add(command: Command): Any {
         val user = userService.findByIdOrCreate(command.userId)
-        if (user.role == Role.ADMIN || user.authorized) {
-            val messages = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
-            if (messages.isEmpty()) {
-                val embed = embedHelper.builder("Reminders")
-                val reminders = if (command.command == "reminders") reminderService.getAll() else
-                    reminderService.getAllByOwner(user)
-                val now = ZonedDateTime.now()
-                embed.setFooter(
-                    "Reminder example: !remind ${now.format(ReminderService.format)} f1 time turds"
-                )
+        val adds = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
+        if (adds.isEmpty()) {
+            val embed = embedHelper.builder("Reminders")
+            val reminders = if (command.command == "reminders") reminderService.getAll() else
+                reminderService.getAllByOwner(user)
+            val now = ZonedDateTime.now()
+            embed.setFooter(
+                "Reminder example: !remind ${now.format(ReminderService.format)} f1 time turds"
+            )
 
-                if (reminders.isEmpty()) {
-                    embed.setDescription("No reminders found.")
-                    return embed
-                }
-
-                
-                for (reminder in reminders.sortedBy { it.remindDate }) {
-                    val parsed = ZonedDateTime.parse(reminder.remindDateString, ReminderService.format)
-                    embed.addField(
-                        "#${reminder.id}. ${reminder.message.trim()}",
-                        "<t:${parsed.toInstant().getEpochSecond()}>",
-                        false
-                    )
-                }
-
+            if (reminders.isEmpty()) {
+                embed.setDescription("No reminders found.")
                 return embed
             }
 
+
+            for (reminder in reminders.sortedBy { it.remindDate }) {
+                val parsed = ZonedDateTime.parse(reminder.remindDateString, ReminderService.format)
+                embed.addField(
+                    "#${reminder.id}. ${reminder.message.trim()}",
+                    "<t:${parsed.toInstant().getEpochSecond()}>",
+                    false
+                )
+            }
+
+            return embed
+        }
+
+        if (user.role == Role.ADMIN || user.authorized) {
             var created = 0
-            for (msg in messages) {
+            for (msg in adds) {
                 val actions = msg.split(" ")
                 val datetime = "${actions[0]} ${actions[1]} ${actions[2]}"
                 val message = actions.toList().subList(3, actions.size).joinToString(" ")

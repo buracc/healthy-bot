@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.springframework.stereotype.Component
-import java.net.URL
 
 @Component
 class TwitterLinkFixer(
@@ -19,21 +18,15 @@ class TwitterLinkFixer(
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val message = event.message
         val content = message.contentRaw
-        if (!content.contains("https://twitter.com")) {
+        if (!content.contains("https://twitter.com") || message.embeds.isNotEmpty()) {
             return
         }
 
-        val newContent = content.replace("twitter.com", "fxtwitter.com")
+        val newContent = content
+            .replace("https://twitter.com", "https://fxtwitter.com")
+        val newMessage = "${message.author.name}: $newContent"
 
-        val url = try {
-            URL(newContent)
-        } catch (e: Exception) {
-            return
-        }
-
-        if (url.host == "fxtwitter.com") {
-//            message.delete().queue()
-            message.channel.sendMessage(newContent).queue()
-        }
+        message.delete().queue()
+        message.channel.sendMessage(newMessage).queue()
     }
 }
