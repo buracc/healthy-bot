@@ -32,7 +32,7 @@ class TwitterLinkFixer(
         }
 
         if (url.host == "fxtwitter.com") {
-            message.delete().queue()
+//            message.delete().queue()
             message.channel.sendMessage(newContent).queue()
         }
     }
