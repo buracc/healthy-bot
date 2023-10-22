@@ -19,9 +19,18 @@ class TwitterLinkFixer(
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val message = event.message
         val content = message.contentRaw
+        if (!content.contains("https://twitter.com")) {
+            return
+        }
+
         val newContent = content.replace("twitter.com", "fxtwitter.com")
 
-        val url = URL(newContent)
+        val url = try {
+            URL(newContent)
+        } catch (e: Exception) {
+            return
+        }
+
         if (url.host == "fxtwitter.com") {
             message.delete().queue()
             message.channel.sendMessage(newContent).queue()
