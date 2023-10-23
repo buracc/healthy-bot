@@ -18,12 +18,13 @@ class TwitterLinkFixer(
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val message = event.message
         val content = message.contentRaw
-        if (!content.contains("https://twitter.com") || message.embeds.isNotEmpty()) {
+        if ((!content.contains("https://twitter.com") && !content.contains("https://x.com") || message.embeds.isNotEmpty()) {
             return
         }
 
         val newContent = content
             .replace("https://twitter.com", "https://fxtwitter.com")
+            .replace("https://x.com", "https://fxtwitter.com")
         val newMessage = "${message.author.name}: $newContent"
 
         message.delete().queue()
