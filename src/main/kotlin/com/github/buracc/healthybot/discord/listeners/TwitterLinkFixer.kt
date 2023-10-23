@@ -18,7 +18,7 @@ class TwitterLinkFixer(
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val message = event.message
         val content = message.contentRaw
-        if ((!content.contains("https://twitter.com") && !content.contains("https://x.com") || message.embeds.isNotEmpty()) {
+        if ((!content.contains("https://twitter.com") && !content.contains("https://x.com")) || message.embeds.isNotEmpty()) {
             return
         }
 
