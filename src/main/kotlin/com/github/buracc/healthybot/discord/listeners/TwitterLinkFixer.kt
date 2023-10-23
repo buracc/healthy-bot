@@ -23,8 +23,8 @@ class TwitterLinkFixer(
         }
 
         val newContent = content
-            .replace("https://twitter.com", "https://fxtwitter.com")
-            .replace("https://x.com", "https://fxtwitter.com")
+            .replace("https://twitter.com", "https://vxtwitter.com")
+            .replace("https://x.com", "https://vxtwitter.com")
         val newMessage = "${message.author.name}: $newContent"
 
         message.delete().queue()
