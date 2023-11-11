@@ -84,6 +84,6 @@ class ChatCommandListener(
     }
 
     private fun storeMarkovMessage(userId: String, message: String) {
-//        markovRepository.store(userId, message)
+        markovRepository.store(userId, message)
     }
 }
