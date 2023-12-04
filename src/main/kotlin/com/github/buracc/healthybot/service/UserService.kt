@@ -20,6 +20,10 @@ class UserService(
         User(id)
     }
 
+    fun deleteIfExists(id: String) = userRepository.findById(id).ifPresent {
+        userRepository.delete(it)
+    }
+
     fun save(user: User) = userRepository.save(user)
 
     fun clear() = userRepository.deleteAll()
