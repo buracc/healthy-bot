@@ -21,17 +21,22 @@ class UserCommandHandler(
     private val userService: UserService
 ) : CommandHandler() {
     override fun handle(command: Command, message: Message) {
-        if (command.command == "inthards") {
-            respond({ inthards(command) }, message)
-        } else {
-            respond({
-                when (command.actions.getOrNull(1)) {
-                    "latest_message" -> latestMessage(command)
-                    "authorize" -> authorize(command)
-                    "sync" -> sync(command)
-                    else -> "Invalid action."
-                }
-            }, message)
+        when (command.command) {
+            "inthards" -> {
+                respond({ inthards(command) }, message)
+            }
+            "sync" -> {
+                respond({ sync(command) }, message)
+            }
+            else -> {
+                respond({
+                    when (command.actions.getOrNull(1)) {
+                        "latest_message" -> latestMessage(command)
+                        "authorize" -> authorize(command)
+                        else -> "Invalid action."
+                    }
+                }, message)
+            }
         }
     }
 
