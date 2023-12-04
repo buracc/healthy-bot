@@ -5,6 +5,7 @@ import com.github.buracc.healthybot.discord.commands.*
 import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.repository.MarkovRepository
 import com.github.buracc.healthybot.service.SettingService
+import com.github.buracc.healthybot.service.UserService
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -14,9 +15,10 @@ import org.springframework.stereotype.Component
 import jakarta.annotation.PostConstruct
 
 @Component
-class ChatCommandListener(
+class ChatListener(
     private val jda: JDA,
     private val guild: Guild,
+    private val userService: UserService,
     private val settingService: SettingService,
     private val birthdayCommandHandler: BirthdayCommandHandler,
     private val settingsCommandHandler: SettingsCommandHandler,
@@ -44,6 +46,10 @@ class ChatCommandListener(
         if (member.id == jda.selfUser.id) {
             return
         }
+
+        val user = userService.findByIdOrCreate(member.id)
+        user.lastMessage = event.message.timeCreated.toInstant()
+        userService.save(user)
 
         val memberId = member.idLong
         val message = event.message
@@ -76,7 +82,7 @@ class ChatCommandListener(
         when (command.command) {
             "bday" -> birthdayCommandHandler.handle(command, message)
             "settings" -> settingsCommandHandler.handle(command, message)
-            "user" -> userCommandHandler.handle(command, message)
+            "user", "inthards" -> userCommandHandler.handle(command, message)
             "remind", "reminder", "reminders" -> reminderCommandHandler.handle(command, message)
             "markov" -> markovCommandHandler.handle(command, message)
             "ai" -> aiCommandHandler.handle(command, message)

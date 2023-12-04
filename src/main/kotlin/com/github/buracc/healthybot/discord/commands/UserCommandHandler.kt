@@ -7,10 +7,11 @@ import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.repository.entity.Role
 import com.github.buracc.healthybot.service.SettingService
 import com.github.buracc.healthybot.service.UserService
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
+import java.time.Instant
 
 @Component
 class UserCommandHandler(
@@ -19,13 +20,17 @@ class UserCommandHandler(
     private val userService: UserService
 ) : CommandHandler() {
     override fun handle(command: Command, message: Message) {
-        respond({
-            when (command.actions.getOrNull(1)) {
-                "latest_message" -> latestMessage(command)
-                "authorize" -> authorize(command)
-                else -> "Invalid action."
-            }
-        }, message)
+        if (command.command == "inthards") {
+            respond({ inthards(command) }, message)
+        } else {
+            respond({
+                when (command.actions.getOrNull(1)) {
+                    "latest_message" -> latestMessage(command)
+                    "authorize" -> authorize(command)
+                    else -> "Invalid action."
+                }
+            }, message)
+        }
     }
 
     private fun authorize(command: Command): String {
@@ -40,6 +45,26 @@ class UserCommandHandler(
         userService.save(member.also { it.authorized = !it.authorized })
 
         return "<@${member.discordId}> is ${if (member.authorized) "now" else "no longer"} authorized to use commands."
+    }
+
+    private fun inthards(command: Command): EmbedBuilder {
+        val topX = command.actions.getOrNull(0)?.toIntOrNull() ?: 5
+        val users = userService.findAll()
+            .sortedByDescending { it.lastMessage }
+            .take(topX)
+
+        val embed = embedHelper.builder("Inthards Top List")
+        embed.setDescription("Top $topX inactive inters")
+
+        users.forEach { user ->
+            embed.addField(
+                "<@${user.discordId}>",
+                "<t:${user.lastMessage?.epochSecond ?: Instant.EPOCH.epochSecond}>",
+                false
+            )
+        }
+
+        return embed
     }
 
     private fun latestMessage(command: Command): String {
