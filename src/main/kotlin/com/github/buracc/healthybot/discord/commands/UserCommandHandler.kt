@@ -50,16 +50,16 @@ class UserCommandHandler(
     private fun inthards(command: Command): EmbedBuilder {
         val topX = command.actions.getOrNull(0)?.toIntOrNull() ?: 5
         val users = userService.findAll()
-            .sortedByDescending { it.lastMessage }
+            .sortedBy { it.lastMessage }
             .take(topX)
 
         val embed = embedHelper.builder("Inthards Top List")
         embed.setDescription("Top $topX inactive inters")
 
-        users.forEach { user ->
+        users.forEachIndexed { idx, user ->
             embed.addField(
-                "<@${user.discordId}>",
-                "<t:${user.lastMessage?.epochSecond ?: Instant.EPOCH.epochSecond}>",
+                "${idx.plus(1)}.",
+                "<@${user.discordId}>: <t:${user.lastMessage?.epochSecond ?: Instant.EPOCH.epochSecond}>",
                 false
             )
         }
