@@ -25,14 +25,12 @@ class UserCommandHandler(
             "inthards" -> {
                 respond({ inthards(command) }, message)
             }
-            "sync" -> {
-                respond({ sync(command) }, message)
-            }
             else -> {
                 respond({
-                    when (command.actions.getOrNull(1)) {
+                    when (command.actions.getOrNull(0)) {
                         "latest_message" -> latestMessage(command)
                         "authorize" -> authorize(command)
+                        "sync" -> sync(command)
                         else -> "Invalid action."
                     }
                 }, message)
