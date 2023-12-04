@@ -16,6 +16,10 @@ class UserService(
         save(User(id))
     }
 
+    fun createIfNotExists(id: String) = userRepository.findById(id).orElseGet {
+        User(id)
+    }
+
     fun save(user: User) = userRepository.save(user)
 
     fun clear() = userRepository.deleteAll()

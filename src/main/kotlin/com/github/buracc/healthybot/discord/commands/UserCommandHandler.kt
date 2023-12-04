@@ -44,11 +44,13 @@ class UserCommandHandler(
             throw UnauthorizedException("You are not authorized to use this command.")
         }
 
-        userService.saveAll(guild.members.map { member ->
-            userService.findByIdOrCreate(member.id)
-        })
+        guild.loadMembers().onSuccess {
+            val users = it.map { member -> userService.createIfNotExists(member.id) }
+            userService.saveAll(users)
+            guild.getTextChannelById(command.channelId)?.sendMessage("Synced ${users.size} members with database.")
+        }
 
-        return "Synced ${guild.members.size} members."
+        return "Syncing members with database..."
     }
 
     private fun authorize(command: Command): String {
