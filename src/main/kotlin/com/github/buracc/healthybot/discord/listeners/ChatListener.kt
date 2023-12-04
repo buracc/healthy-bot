@@ -47,9 +47,11 @@ class ChatListener(
             return
         }
 
-        val user = userService.findByIdOrCreate(member.id)
-        user.lastMessage = event.message.timeCreated.toInstant()
-        userService.save(user)
+        if (!member.user.isBot) {
+            val user = userService.findByIdOrCreate(member.id)
+            user.lastMessage = event.message.timeCreated.toInstant()
+            userService.save(user)
+        }
 
         val memberId = member.idLong
         val message = event.message
