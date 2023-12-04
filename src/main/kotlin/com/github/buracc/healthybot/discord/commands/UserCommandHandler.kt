@@ -47,7 +47,9 @@ class UserCommandHandler(
         guild.loadMembers().onSuccess {
             val users = it.map { member -> userService.createIfNotExists(member.id) }
             userService.saveAll(users)
-            guild.getTextChannelById(command.channelId)?.sendMessage("Synced ${users.size} members with database.")
+            guild.getTextChannelById(command.channelId)
+                ?.sendMessage("Synced ${users.size} members with database.")
+                ?.queue()
         }
 
         return "Syncing members with database..."
