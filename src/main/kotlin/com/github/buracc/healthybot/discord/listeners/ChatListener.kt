@@ -82,7 +82,7 @@ class ChatListener(
         when (command.command) {
             "bday" -> birthdayCommandHandler.handle(command, message)
             "settings" -> settingsCommandHandler.handle(command, message)
-            "user", "inthards" -> userCommandHandler.handle(command, message)
+            "user", "users", "inthards" -> userCommandHandler.handle(command, message)
             "remind", "reminder", "reminders" -> reminderCommandHandler.handle(command, message)
             "markov" -> markovCommandHandler.handle(command, message)
             "ai" -> aiCommandHandler.handle(command, message)

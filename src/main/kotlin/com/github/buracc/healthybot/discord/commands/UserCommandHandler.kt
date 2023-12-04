@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
 import java.time.Instant
+import kotlin.math.abs
 
 @Component
 class UserCommandHandler(
@@ -27,10 +28,24 @@ class UserCommandHandler(
                 when (command.actions.getOrNull(1)) {
                     "latest_message" -> latestMessage(command)
                     "authorize" -> authorize(command)
+                    "sync" -> sync(command)
                     else -> "Invalid action."
                 }
             }, message)
         }
+    }
+
+    private fun sync(command: Command): String {
+        val user = userService.findByIdOrCreate(command.userId)
+        if (user.role != Role.ADMIN) {
+            throw UnauthorizedException("You are not authorized to use this command.")
+        }
+
+        userService.saveAll(guild.members.map { member ->
+            userService.findByIdOrCreate(member.id)
+        })
+
+        return "Synced ${guild.members.size} members."
     }
 
     private fun authorize(command: Command): String {
@@ -51,7 +66,7 @@ class UserCommandHandler(
         val topX = command.actions.getOrNull(0)?.toIntOrNull() ?: 5
         val users = userService.findAll()
             .sortedBy { it.lastMessage }
-            .take(topX)
+            .take(abs(topX))
 
         val embed = embedHelper.builder("Inthards Top List")
         embed.setDescription("Top $topX inactive inters")
