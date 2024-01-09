@@ -1,4 +1,4 @@
-package com.github.buracc.healthybot.api.openapi.chat
+package com.github.buracc.healthybot.api.openai.chat
 
 import java.time.Instant
 

@@ -1,6 +1,6 @@
 package com.github.buracc.healthybot.discord.commands
 
-import com.github.buracc.healthybot.api.openapi.OpenAIClient
+import com.github.buracc.healthybot.api.openai.OpenAIClient
 import com.github.buracc.healthybot.discord.SettingConstants
 import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.discord.helper.Utils
@@ -26,11 +26,8 @@ class AICommandHandler(
             lastInvocation = Instant.now()
             respond({
                 when (command.actions.getOrNull(0)) {
-                    "chat" -> chat(command)
-                    "text" -> text(command, "text-davinci-003")
-                    "code" -> text(command, "code-davinci-002")
                     "image" -> image(command)
-                    else -> text(command, "text-davinci-003")
+                    else -> chat(command)
                 }
             }, message)
         }
@@ -44,6 +41,7 @@ class AICommandHandler(
             ?.queue()
 
         val image = openAIClient.createImage(
+            settingService.get(SettingConstants.AI_INITIAL_PROMPT),
             command.messageTrimmed.substring(command.actions.getOrNull(0)?.length ?: 0),
             command.userId.toString()
         ) ?: throw BotException("Could not retrieve response from OpenAI.")
@@ -61,30 +59,14 @@ class AICommandHandler(
             ?.queue()
 
         val chat = openAIClient.createChat(
+            settingService.get(SettingConstants.AI_INITIAL_PROMPT),
             command.messageTrimmed.substring(command.actions.getOrNull(0)?.length ?: 0),
-            command.userId.toString()
+            settingService.get(SettingConstants.AI_CHAT_MODEL),
+            command.userId.toString(),
         ) ?: throw BotException("Could not retrieve response from OpenAI.")
 
         return NoEmbed(
             chat.choices.getOrNull(0)?.message?.content ?: throw BotException("Chat response was empty.")
-        )
-    }
-
-    private fun text(command: Command, model: String): NoEmbed {
-        Utils.filterMessageExplicitWords(command.messageTrimmed)
-
-        guild.getTextChannelById(command.channelId)
-            ?.sendMessage("OpenAI is thinking...")
-            ?.queue()
-
-        val text = openAIClient.createText(
-            command.messageTrimmed.substring(command.actions.getOrNull(0)?.length ?: 0),
-            command.userId.toString(),
-            model
-        ) ?: throw BotException("Could not retrieve response from OpenAI.")
-
-        return NoEmbed(
-            text.choices.getOrNull(0)?.text ?: throw BotException("Text response was empty.")
         )
     }
 }

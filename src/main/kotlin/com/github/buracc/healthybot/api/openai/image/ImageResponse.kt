@@ -1,4 +1,4 @@
-package com.github.buracc.healthybot.api.openapi.image
+package com.github.buracc.healthybot.api.openai.image
 
 import java.time.Instant
 
