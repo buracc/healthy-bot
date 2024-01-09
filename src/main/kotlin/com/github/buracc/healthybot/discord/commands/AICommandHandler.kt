@@ -60,8 +60,8 @@ class AICommandHandler(
 
         val chat = openAIClient.createChat(
             settingService.get(SettingConstants.AI_INITIAL_PROMPT),
-            command.messageTrimmed.substring(command.actions.getOrNull(0)?.length ?: 0),
             settingService.get(SettingConstants.AI_CHAT_MODEL),
+            command.messageTrimmed.substring(command.actions.getOrNull(0)?.length ?: 0),
             command.userId.toString(),
         ) ?: throw BotException("Could not retrieve response from OpenAI.")
 
