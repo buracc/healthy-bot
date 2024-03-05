@@ -57,7 +57,7 @@ class ReminderCommandHandler(
             }
 
 
-            for (reminder in reminders.sortedBy { it.remindDate }) {
+            for (reminder in reminders.sortedBy { it.remindDate }.take(25)) {
                 val parsed = ZonedDateTime.parse(reminder.remindDateString, ReminderService.format)
                 embed.addField(
                     "#${reminder.id}. ${reminder.message.trim()}",
