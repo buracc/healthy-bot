@@ -42,10 +42,14 @@ class ReminderCommandHandler(
     fun add(command: Command): Any {
         val user = userService.findByIdOrCreate(command.userId)
         val adds = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
-        if (adds.isEmpty()) {
+        if (adds.isEmpty() || command.actions.contains("today")) {
             val embed = embedHelper.builder("Reminders")
-            val reminders = if (command.command == "reminders") reminderService.getAll() else
+            var reminders = if (command.command == "reminders") reminderService.getAll() else
                 reminderService.getAllByOwner(user)
+            if (command.actions.contains("today")) {
+                reminders = reminders.filter { it.remindDate.toLocalDate() == ZonedDateTime.now().toLocalDate() }
+            }
+
             val now = ZonedDateTime.now()
             embed.setFooter(
                 "Reminder example: !remind ${now.format(ReminderService.format)} f1 time turds"
@@ -61,7 +65,7 @@ class ReminderCommandHandler(
                 val parsed = ZonedDateTime.parse(reminder.remindDateString, ReminderService.format)
                 embed.addField(
                     "#${reminder.id}. ${reminder.message.trim()}",
-                    "<t:${parsed.toInstant().getEpochSecond()}>",
+                    "<t:${parsed.toInstant().epochSecond}>",
                     false
                 )
             }
