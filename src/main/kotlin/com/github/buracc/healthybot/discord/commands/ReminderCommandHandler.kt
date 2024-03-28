@@ -73,7 +73,7 @@ class ReminderCommandHandler(
             return embed
         }
 
-        if (user.role == Role.ADMIN || user.authorized) {
+        if (user.role == Role.ADMIN || user.authorized || command.hof) {
             var created = 0
             for (msg in adds) {
                 val actions = msg.split(" ")

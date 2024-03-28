@@ -3,7 +3,6 @@ package com.github.buracc.healthybot.discord.commands
 import com.github.buracc.healthybot.api.openai.OpenAIClient
 import com.github.buracc.healthybot.discord.SettingConstants
 import com.github.buracc.healthybot.discord.exception.BotException
-import com.github.buracc.healthybot.discord.helper.Utils
 import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.discord.model.NoEmbed
 import com.github.buracc.healthybot.service.SettingService
@@ -34,8 +33,6 @@ class AICommandHandler(
     }
 
     private fun image(command: Command): NoEmbed {
-        Utils.filterMessageExplicitWords(command.messageTrimmed)
-
         guild.getTextChannelById(command.channelId)
             ?.sendMessage("OpenAI is thinking...")
             ?.queue()
@@ -52,8 +49,6 @@ class AICommandHandler(
     }
 
     private fun chat(command: Command): NoEmbed {
-        Utils.filterMessageExplicitWords(command.messageTrimmed)
-
         guild.getTextChannelById(command.channelId)
             ?.sendMessage("OpenAI is thinking...")
             ?.queue()

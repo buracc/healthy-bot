@@ -78,7 +78,8 @@ class ChatListener(
             commandText.substring(1),
             trimmedContent,
             actions,
-            message.guildChannel.id
+            message.guildChannel.id,
+            member.roles.any { it.id == "446675275179098113" }
         )
 
         when (command.command) {
