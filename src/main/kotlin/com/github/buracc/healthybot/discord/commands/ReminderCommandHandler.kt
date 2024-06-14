@@ -42,7 +42,7 @@ class ReminderCommandHandler(
     fun add(command: Command): Any {
         val user = userService.findByIdOrCreate(command.userId)
         val adds = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
-        if (adds.isEmpty() || command.actions.contains("today")) {
+        if (adds.isEmpty() || command.actions.any { it == "today" || it == "tomorrow" || it == "week" || it == "month"}) {
             val embed = embedHelper.builder("Reminders")
             var reminders = if (command.command == "reminders") reminderService.getAll() else
                 reminderService.getAllByOwner(user)
