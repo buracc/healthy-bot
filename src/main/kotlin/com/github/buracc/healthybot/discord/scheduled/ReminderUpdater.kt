@@ -4,6 +4,7 @@ import com.github.buracc.healthybot.service.ReminderService
 import net.dv8tion.jda.api.entities.Guild
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Component
@@ -24,7 +25,7 @@ class ReminderUpdater(
         val remindersToday = reminderService.getAll()
             .map {
                 it.copy(
-                    remindDateString = it.remindDate.withZoneSameInstant(ZonedDateTime.now().zone)
+                    remindDateString = it.remindDate.withZoneSameInstant(ZoneId.of("Europe/Amsterdam"))
                         .format(ReminderService.format)
                 )
             }
