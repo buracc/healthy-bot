@@ -46,8 +46,19 @@ class ReminderCommandHandler(
             val embed = embedHelper.builder("Reminders")
             var reminders = if (command.command == "reminders") reminderService.getAll() else
                 reminderService.getAllByOwner(user)
-            if (command.actions.contains("today")) {
-                reminders = reminders.filter { it.remindDate.toLocalDate() == ZonedDateTime.now().toLocalDate() }
+            when {
+                command.actions.contains("today") -> {
+                    reminders = reminders.filter { it.remindDate.toLocalDate() == ZonedDateTime.now().toLocalDate() }
+                }
+                command.actions.contains("tomorrow") -> {
+                    reminders = reminders.filter { it.remindDate.toLocalDate() == ZonedDateTime.now().plusDays(1).toLocalDate() }
+                }
+                command.actions.contains("week") -> {
+                    reminders = reminders.filter { it.remindDate.toLocalDate() in ZonedDateTime.now().toLocalDate()..ZonedDateTime.now().plusDays(7).toLocalDate() }
+                }
+                command.actions.contains("month") -> {
+                    reminders = reminders.filter { it.remindDate.toLocalDate() in ZonedDateTime.now().toLocalDate()..ZonedDateTime.now().plusMonths(1).toLocalDate() }
+                }
             }
 
             val now = ZonedDateTime.now()
