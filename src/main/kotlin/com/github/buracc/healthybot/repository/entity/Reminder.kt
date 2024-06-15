@@ -1,7 +1,6 @@
 package com.github.buracc.healthybot.repository.entity
 
-import com.github.buracc.healthybot.service.ReminderService
-import java.time.ZonedDateTime
+import com.github.buracc.healthybot.discord.helper.Utils.parseDateTime
 import jakarta.persistence.*
 
 @Entity
@@ -14,6 +13,6 @@ data class Reminder(
     @OneToOne
     val owner: User
 ) {
-    val remindDate: ZonedDateTime
-        get() = ZonedDateTime.parse(remindDateString, ReminderService.format)
+    val remindDate
+        get() = parseDateTime(remindDateString)
 }

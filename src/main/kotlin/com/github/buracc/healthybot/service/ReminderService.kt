@@ -2,24 +2,18 @@ package com.github.buracc.healthybot.service
 
 import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.discord.exception.UnauthorizedException
+import com.github.buracc.healthybot.discord.helper.Utils.parseDateTime
 import com.github.buracc.healthybot.repository.ReminderRepository
 import com.github.buracc.healthybot.repository.entity.Reminder
 import com.github.buracc.healthybot.repository.entity.User
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import jakarta.transaction.Transactional
 
 @Service
 class ReminderService(
     private val reminderRepository: ReminderRepository
 ) {
-    companion object {
-        val format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm z")
-    }
-
     fun getAll() = reminderRepository.findAll().toList()
 
     fun getById(id: Long) = reminderRepository.findById(id)
@@ -35,7 +29,7 @@ class ReminderService(
 
     fun add(time: String, message: String, user: User): Reminder {
         try {
-            val dateTime = ZonedDateTime.parse(time, format)
+            val dateTime = parseDateTime(time)
             if (dateTime.toInstant() < Instant.now()) {
                 throw BotException("Reminder needs to be in the future.")
             }

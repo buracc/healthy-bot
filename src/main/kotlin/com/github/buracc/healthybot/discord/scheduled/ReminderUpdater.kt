@@ -1,11 +1,11 @@
 package com.github.buracc.healthybot.discord.scheduled
 
+import com.github.buracc.healthybot.discord.helper.Utils.TZ
+import com.github.buracc.healthybot.discord.helper.Utils.now
 import com.github.buracc.healthybot.service.ReminderService
 import net.dv8tion.jda.api.entities.Guild
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 @Component
 class ReminderUpdater(
@@ -25,11 +25,11 @@ class ReminderUpdater(
         val remindersToday = reminderService.getAll()
             .map {
                 it.copy(
-                    remindDateString = it.remindDate.withZoneSameInstant(ZoneId.of("Europe/Amsterdam"))
+                    remindDateString = it.remindDate.withZoneSameInstant(TZ)
                         .format(ReminderService.format)
                 )
             }
-            .filter { it.remindDate.toLocalDate() == ZonedDateTime.now().toLocalDate() }
+            .filter { it.remindDate.toLocalDate() == now().toLocalDate() }
             .sortedBy { it.remindDate }
             .take(3)
 
