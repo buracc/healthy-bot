@@ -1,5 +1,6 @@
 package com.github.buracc.healthybot.discord.scheduled
 
+import com.github.buracc.healthybot.discord.helper.Utils.FORMAT
 import com.github.buracc.healthybot.discord.helper.Utils.TZ
 import com.github.buracc.healthybot.discord.helper.Utils.now
 import com.github.buracc.healthybot.service.ReminderService
@@ -26,7 +27,7 @@ class ReminderUpdater(
             .map {
                 it.copy(
                     remindDateString = it.remindDate.withZoneSameInstant(TZ)
-                        .format(ReminderService.format)
+                        .format(FORMAT)
                 )
             }
             .filter { it.remindDate.toLocalDate() == now().toLocalDate() }
