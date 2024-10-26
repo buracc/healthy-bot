@@ -26,6 +26,9 @@ object Utils {
         return ZonedDateTime.parse(time, FORMAT)
     }
 
+    fun zonedDateTime(instant: Instant) =
+        ZonedDateTime.ofInstant(instant, TZ)
+
     fun localDate(instant: Instant) =
-        ZonedDateTime.ofInstant(instant, TZ).toLocalDate()
+        zonedDateTime(instant).toLocalDate()
 }

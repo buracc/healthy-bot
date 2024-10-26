@@ -2,6 +2,7 @@ package com.github.buracc.healthybot.discord.scheduled
 
 import com.github.buracc.healthybot.discord.helper.Utils.localDate
 import com.github.buracc.healthybot.discord.helper.Utils.now
+import com.github.buracc.healthybot.discord.helper.Utils.zonedDateTime
 import com.github.buracc.healthybot.service.ReminderService
 import net.dv8tion.jda.api.entities.Guild
 import org.springframework.scheduling.annotation.Scheduled
@@ -32,7 +33,7 @@ class ReminderUpdater(
         category.voiceChannels.forEach { it.delete().queue() }
 
         for (reminder in remindersToday) {
-            val eventTime = localDate(reminder.date).toString()
+            val eventTime = zonedDateTime(reminder.date).toLocalTime().toString()
 
             guild.createVoiceChannel("$eventTime - ${reminder.message}")
                 .setParent(category)
