@@ -20,7 +20,7 @@ class ReminderAnnouncer(
     fun checkAndAnnounce() {
         val now = Instant.now()
         val reminders = reminderService.getAll()
-            .filter { now >= it.remindDate.toInstant() }
+            .filter { now >= it.date }
 
         if (reminders.isNotEmpty()) {
             val embed = embedHelper.builder("Reminders")

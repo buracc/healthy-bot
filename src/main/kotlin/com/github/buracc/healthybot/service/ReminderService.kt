@@ -30,19 +30,22 @@ class ReminderService(
     fun add(time: String, message: String, user: User): Reminder {
         try {
             val dateTime = parseDateTime(time)
-            if (dateTime.toInstant() < Instant.now()) {
+            val instant = dateTime.toInstant()
+            if (instant < Instant.now()) {
                 throw BotException("Reminder needs to be in the future.")
             }
 
             val reminder = Reminder(
                 message = message,
-                remindDateString = time,
+                date = instant,
                 owner = user
             )
             return reminderRepository.save(reminder)
         } catch (e: Exception) {
-            throw BotException("Failed to add reminder, make sure the formatting is correct (eg. 30-09-2022 19:24 Europe/Amsterdam). " +
-                    "Check https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of supported timezones (under TZ identifier).")
+            throw BotException(
+                "Failed to add reminder, make sure the formatting is correct (eg. 30-09-2022 19:24 Europe/Amsterdam). " +
+                        "Check https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of supported timezones (under TZ identifier)."
+            )
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.github.buracc.healthybot.discord.helper
 
 import net.dv8tion.jda.api.entities.Member
+import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -24,4 +25,7 @@ object Utils {
     fun parseDateTime(time: String): ZonedDateTime {
         return ZonedDateTime.parse(time, FORMAT)
     }
+
+    fun localDate(instant: Instant) =
+        ZonedDateTime.ofInstant(instant, TZ).toLocalDate()
 }

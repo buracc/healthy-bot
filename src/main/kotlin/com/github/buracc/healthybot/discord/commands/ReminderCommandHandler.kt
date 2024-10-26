@@ -3,8 +3,8 @@ package com.github.buracc.healthybot.discord.commands
 import com.github.buracc.healthybot.discord.exception.BotException
 import com.github.buracc.healthybot.discord.exception.UnauthorizedException
 import com.github.buracc.healthybot.discord.helper.Utils.FORMAT
+import com.github.buracc.healthybot.discord.helper.Utils.localDate
 import com.github.buracc.healthybot.discord.helper.Utils.now
-import com.github.buracc.healthybot.discord.helper.Utils.parseDateTime
 import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.repository.entity.Role
 import com.github.buracc.healthybot.service.ReminderService
@@ -44,23 +44,33 @@ class ReminderCommandHandler(
     fun add(command: Command): Any {
         val user = userService.findByIdOrCreate(command.userId)
         val adds = command.messageTrimmed.split(";", "\n").filter { it.isNotBlank() }
-        if (adds.isEmpty() || command.actions.any { it == "today" || it == "tomorrow" || it == "week" || it == "month"}) {
+        if (adds.isEmpty() || command.actions.any { it == "today" || it == "tomorrow" || it == "week" || it == "month" }) {
             val now = now()
             val embed = embedHelper.builder("Reminders")
             var reminders = if (command.command == "reminders") reminderService.getAll() else
                 reminderService.getAllByOwner(user)
             when {
                 command.actions.contains("today") -> {
-                    reminders = reminders.filter { it.remindDate.toLocalDate() == now.toLocalDate() }
+                    reminders =
+                        reminders.filter { localDate(it.date) == now.toLocalDate() }
                 }
+
                 command.actions.contains("tomorrow") -> {
-                    reminders = reminders.filter { it.remindDate.toLocalDate() == now.plusDays(1).toLocalDate() }
+                    reminders = reminders.filter {
+                        localDate(it.date) == now.plusDays(1).toLocalDate()
+                    }
                 }
+
                 command.actions.contains("week") -> {
-                    reminders = reminders.filter { it.remindDate.toLocalDate() in now.toLocalDate()..now.plusDays(7).toLocalDate() }
+                    reminders = reminders.filter {
+                        localDate(it.date) in now.toLocalDate()..now.plusDays(7).toLocalDate()
+                    }
                 }
+
                 command.actions.contains("month") -> {
-                    reminders = reminders.filter { it.remindDate.toLocalDate() in now.toLocalDate()..now.plusMonths(1).toLocalDate() }
+                    reminders = reminders.filter {
+                        localDate(it.date) in now.toLocalDate()..now.plusMonths(1).toLocalDate()
+                    }
                 }
             }
 
@@ -74,11 +84,10 @@ class ReminderCommandHandler(
             }
 
 
-            for (reminder in reminders.sortedBy { it.remindDate }.take(25)) {
-                val parsed = parseDateTime(reminder.remindDateString)
+            for (reminder in reminders.sortedBy { it.date }.take(25)) {
                 embed.addField(
                     "#${reminder.id}. ${reminder.message.trim()}",
-                    "<t:${parsed.toInstant().epochSecond}>",
+                    "<t:${reminder.date.epochSecond}>",
                     false
                 )
             }

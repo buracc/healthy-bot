@@ -1,7 +1,7 @@
 package com.github.buracc.healthybot.repository.entity
 
-import com.github.buracc.healthybot.discord.helper.Utils.parseDateTime
 import jakarta.persistence.*
+import java.time.Instant
 
 @Entity
 data class Reminder(
@@ -9,10 +9,7 @@ data class Reminder(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     val message: String,
-    val remindDateString: String,
-    @OneToOne
+    val date: Instant,
+    @ManyToOne
     val owner: User
-) {
-    val remindDate
-        get() = parseDateTime(remindDateString)
-}
+)

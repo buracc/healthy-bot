@@ -1,7 +1,6 @@
 package com.github.buracc.healthybot.discord.scheduled
 
-import com.github.buracc.healthybot.discord.helper.Utils.FORMAT
-import com.github.buracc.healthybot.discord.helper.Utils.TZ
+import com.github.buracc.healthybot.discord.helper.Utils.localDate
 import com.github.buracc.healthybot.discord.helper.Utils.now
 import com.github.buracc.healthybot.service.ReminderService
 import net.dv8tion.jda.api.entities.Guild
@@ -24,14 +23,8 @@ class ReminderUpdater(
     @Scheduled(cron = "0 */10 * * * *")
     fun checkAndAnnounce() {
         val remindersToday = reminderService.getAll()
-            .map {
-                it.copy(
-                    remindDateString = it.remindDate.withZoneSameInstant(TZ)
-                        .format(FORMAT)
-                )
-            }
-            .filter { it.remindDate.toLocalDate() == now().toLocalDate() }
-            .sortedBy { it.remindDate }
+            .filter { localDate(it.date) == now().toLocalDate() }
+            .sortedBy { it.date }
             .take(3)
 
         val category = guild.getCategoryById(category) ?: return
@@ -39,7 +32,7 @@ class ReminderUpdater(
         category.voiceChannels.forEach { it.delete().queue() }
 
         for (reminder in remindersToday) {
-            val eventTime = reminder.remindDate.toLocalTime().toString()
+            val eventTime = localDate(reminder.date).toString()
 
             guild.createVoiceChannel("$eventTime - ${reminder.message}")
                 .setParent(category)
