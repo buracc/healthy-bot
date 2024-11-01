@@ -1,19 +1,17 @@
-version: '3'
-
 services:
   healthy-bot-db:
     container_name: healthy-bot-db
     image: postgres:alpine
     hostname: healthy-bot-db
     ports:
-      - "5402:5402"
+      - "5432:5432"
     environment:
       - POSTGRES_DB=healthybot
       - POSTGRES_USER=healthybot
       - POSTGRES_PASSWORD=healthybot
     volumes:
       - healthy-bot-db:/var/lib/postgresql/data
-    command: -p 5402
+    restart: unless-stopped
 
   healthy-bot:
     container_name: healthy-bot
@@ -25,6 +23,7 @@ services:
       - .env
     volumes:
       - healthy-bot:/healthybot/data
+    restart: unless-stopped
 
 volumes:
   healthy-bot-db:
