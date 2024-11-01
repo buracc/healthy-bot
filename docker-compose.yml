@@ -15,6 +15,7 @@ services:
 
   healthy-bot:
     container_name: healthy-bot
+    image: ghcr.io/buracc/healthy-bot/healthy-bot:latest
     hostname: healthy-bot
     depends_on:
       - healthy-bot-db
