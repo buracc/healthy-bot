@@ -42,6 +42,7 @@ class ReminderService(
             )
             return reminderRepository.save(reminder)
         } catch (e: Exception) {
+            e.printStackTrace()
             throw BotException(
                 "Failed to add reminder, make sure the formatting is correct (eg. 30-09-2022 19:24 Europe/Amsterdam). " +
                         "Check https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of supported timezones (under TZ identifier)."
