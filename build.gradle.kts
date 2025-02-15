@@ -26,9 +26,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.google.code.gson:gson:2.8.9")
-    runtimeOnly("org.postgresql:postgresql")
+    implementation("org.xerial:sqlite-jdbc:3.49.0.0")
+    implementation("org.hibernate.orm:hibernate-community-dialects")
 
-    implementation("net.dv8tion:JDA:5.0.0-beta.5")
+    implementation("net.dv8tion:JDA:5.3.0")
 }
 
 tasks.withType<KotlinCompile> {

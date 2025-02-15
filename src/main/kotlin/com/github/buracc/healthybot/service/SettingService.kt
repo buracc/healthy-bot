@@ -13,7 +13,7 @@ class SettingService(
 
     fun get(key: String) = settingRepository.findById(key)
         .orElseThrow { NotFoundException("Setting not found.") }
-        .value
+        .v
 
     fun getBoolean(key: String) = get(key).toBoolean()
 

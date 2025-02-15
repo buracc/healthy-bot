@@ -29,7 +29,7 @@ class SettingsCommandHandler(
     fun display(): EmbedBuilder {
         val embed = embedHelper.builder("HealthyBot Settings")
         settingService.findAll().forEach {
-            embed.addField(it.key, it.value, false)
+            embed.addField(it.k, it.v, false)
         }
 
         return embed
@@ -43,7 +43,7 @@ class SettingsCommandHandler(
         val option = command.actions.getOrNull(1) ?: throw NotFoundException("No key supplied.")
         val value = command.actions.getOrNull(2) ?: throw NotFoundException("No value supplied.")
         val setting = settingService.findById(option)
-        val save = settingService.save(setting.also { it.value = value })
-        return "Setting ${save.key} set to ${save.value}"
+        val save = settingService.save(setting.also { it.v = value })
+        return "Setting ${save.k} set to ${save.v}"
     }
 }
