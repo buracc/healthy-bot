@@ -26,7 +26,8 @@ class AiListener(private val jda: JDA, private val openAIClient: OpenAIClient,
 
         val message = event.message
         val mentioned = message.mentions.users.any { it.id == selfUser.id }
-        if (!mentioned) {
+        val replied = message.referencedMessage != null && message.referencedMessage?.author?.id == selfUser.id
+        if (!mentioned && !replied) {
             return
         }
 
