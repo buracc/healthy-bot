@@ -42,26 +42,32 @@ class AiListener(private val jda: JDA, private val openAIClient: OpenAIClient,
             return
         }
 
-        message.addReaction(Emoji.fromUnicode("✅")).queue()
+        message.addReaction(Emoji.fromUnicode("💭")).queue()
 
-        val response = openAIClient.createChat(
-            context,
-            settingService.get(SettingConstants.AI_CHAT_MODEL),
-            prompt,
-            member.id
-        )
+        val response = try {
+            openAIClient.createChat(
+                context,
+                settingService.get(SettingConstants.AI_CHAT_MODEL),
+                prompt,
+                member.id
+            )
+        } catch (e: Exception) {
+            message.reply("An error occurred while communicating with OpenAI").queue()
+            e.printStackTrace()
+            return
+        }
 
         if (response == null || response.choices.isEmpty()) {
-            event.channel.sendMessage("OpenAI did not respond.").queue()
+            message.reply("OpenAI did not respond.").queue()
             return
         }
 
         val replyContent = response.choices[0].message.content
         if (replyContent.isEmpty()) {
-            event.channel.sendMessage("OpenAI did not respond.").queue()
+            message.reply("OpenAI did not respond.").queue()
             return
         }
 
-        event.channel.sendMessage(replyContent).queue()
+        message.reply(replyContent).queue()
     }
 }

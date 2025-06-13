@@ -6,13 +6,13 @@ import com.github.buracc.healthybot.discord.model.Command
 import com.github.buracc.healthybot.repository.MarkovRepository
 import com.github.buracc.healthybot.service.SettingService
 import com.github.buracc.healthybot.service.UserService
+import jakarta.annotation.PostConstruct
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import jakarta.annotation.PostConstruct
 
 @Component
 class ChatListener(
@@ -25,8 +25,7 @@ class ChatListener(
     private val userCommandHandler: UserCommandHandler,
     private val reminderCommandHandler: ReminderCommandHandler,
     private val markovCommandHandler: MarkovCommandHandler,
-    private val markovRepository: MarkovRepository,
-    private val aiCommandHandler: AICommandHandler
+    private val markovRepository: MarkovRepository
 ) : ListenerAdapter() {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -88,7 +87,6 @@ class ChatListener(
             "user", "users", "inthards" -> userCommandHandler.handle(command, message)
             "remind", "reminder", "reminders" -> reminderCommandHandler.handle(command, message)
             "markov" -> markovCommandHandler.handle(command, message)
-            "ai" -> aiCommandHandler.handle(command, message)
         }
     }
 
