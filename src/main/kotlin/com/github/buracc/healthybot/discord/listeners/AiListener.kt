@@ -30,22 +30,24 @@ class AiListener(private val jda: JDA, private val openAIClient: OpenAIClient,
             return
         }
 
-        var context: String? = null;
+        var context = "Your name is Mark. You are the 'Cancer Chat' Discord's helpful AI assistant. "
         val reply = message.referencedMessage
         if (reply != null) {
-            val sender = reply.author
-            context = "'${sender.globalName}' said: '${reply.contentRaw}'. "
+            val sender = reply.member
+            context += "'${sender?.effectiveName}' said: '${reply.contentDisplay}'. "
         }
 
-        val content = message.contentRaw.replace("<@!?${selfUser.id}>", "").trim()
-        if (content.isEmpty()) {
+        val prompt = message.contentDisplay.trim()
+        if (prompt.isEmpty()) {
             return
         }
 
+        message.addReaction(Emoji.fromUnicode("✅")).queue()
+
         val response = openAIClient.createChat(
-            context ?: "",
+            context,
             settingService.get(SettingConstants.AI_CHAT_MODEL),
-            content,
+            prompt,
             member.id
         )
 
@@ -60,8 +62,6 @@ class AiListener(private val jda: JDA, private val openAIClient: OpenAIClient,
             return
         }
 
-        event.channel.sendMessage(replyContent).queue { msg ->
-            msg.addReaction(Emoji.fromUnicode("👍")).queue()
-        }
+        event.channel.sendMessage(replyContent).queue()
     }
 }
