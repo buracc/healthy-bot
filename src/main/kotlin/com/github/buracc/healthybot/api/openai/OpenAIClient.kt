@@ -16,8 +16,7 @@ class OpenAIClient(
         model: String,
         text: String,
         discordId: String,
-    ) =
-        openAIRestTemplate.postForObject(
+    ) = openAIRestTemplate.postForObject(
             "/chat/completions",
             ChatRequest.create(
                 text = "$initialPrompt$text",
