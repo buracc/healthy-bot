@@ -9,7 +9,7 @@ data class ChatRequest(
             text: String,
             model: String
         ) = ChatRequest(
-            messages = listOf(ChatMessage(content = text)),
+            messages = listOf(ChatMessage(name ="User", content = text)),
             model = model
         )
     }
