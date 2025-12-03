@@ -41,7 +41,8 @@ class SettingsCommandHandler(
             throw UnauthorizedException("You are not authorized to change settings.")
         }
         val option = command.actions.getOrNull(1) ?: throw NotFoundException("No key supplied.")
-        val value = command.actions.getOrNull(2) ?: throw NotFoundException("No value supplied.")
+        val value = command.actions.drop(2).takeIf { it.isNotEmpty() }?.joinToString(" ")
+            ?: throw NotFoundException("No value supplied.")
         val setting = settingService.findById(option)
         val save = settingService.save(setting.also { it.v = value })
         return "Setting ${save.k} set to ${save.v}"
