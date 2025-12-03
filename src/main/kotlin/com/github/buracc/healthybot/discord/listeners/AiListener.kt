@@ -1,7 +1,9 @@
 package com.github.buracc.healthybot.discord.listeners
 
 import com.github.buracc.healthybot.api.openai.OpenAIClient
+import com.github.buracc.healthybot.api.openai.chat.ChatMessage
 import com.github.buracc.healthybot.discord.SettingConstants
+import com.github.buracc.healthybot.discord.SettingConstants.AI_INITIAL_PROMPT
 import com.github.buracc.healthybot.service.SettingService
 import jakarta.annotation.PostConstruct
 import net.dv8tion.jda.api.JDA
@@ -11,12 +13,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.springframework.stereotype.Component
 
 @Component
-class AiListener(private val jda: JDA, private val openAIClient: OpenAIClient,
-    private val settingService: SettingService) : ListenerAdapter() {
+class AiListener(
+    private val jda: JDA, private val openAIClient: OpenAIClient,
+    private val settingService: SettingService
+) : ListenerAdapter() {
     @PostConstruct
     fun register() {
         jda.addEventListener(this)
     }
+
     override fun onMessageReceived(event: MessageReceivedEvent) {
         val member = event.member ?: return
         val selfUser = jda.selfUser
@@ -31,26 +36,38 @@ class AiListener(private val jda: JDA, private val openAIClient: OpenAIClient,
             return
         }
 
-        var context = "Your name is Mark. You are the 'Cancer Chat' Discord's helpful AI assistant. "
-        val reply = message.referencedMessage
-        if (reply != null) {
+        val botContext = settingService.get(AI_INITIAL_PROMPT)
+        val botName = selfUser.effectiveName
+        val messages = mutableListOf(
+            ChatMessage("developer", botName, botContext)
+        )
+
+        val replyChain = mutableListOf<ChatMessage>()
+        var reply = message.referencedMessage
+        while (reply != null) {
             val sender = reply.member
-            context += "'${sender?.effectiveName}' said: '${reply.contentDisplay}'. "
+            if (sender != null) {
+                replyChain.add(ChatMessage(name = sender.effectiveName, content = reply.contentDisplay))
+            }
+
+            reply = reply.referencedMessage
         }
+
+        messages.addAll(replyChain.reversed())
 
         val prompt = message.contentDisplay.trim()
         if (prompt.isEmpty()) {
             return
         }
 
+        messages.add(ChatMessage(name = member.effectiveName, content = prompt))
+
         message.addReaction(Emoji.fromUnicode("💭")).queue()
 
         val response = try {
             openAIClient.createChat(
-                context,
                 settingService.get(SettingConstants.AI_CHAT_MODEL),
-                prompt,
-                member.id
+                messages
             )
         } catch (e: Exception) {
             message.reply("An error occurred while communicating with OpenAI").queue()

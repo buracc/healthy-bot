@@ -1,5 +1,6 @@
 package com.github.buracc.healthybot.api.openai
 
+import com.github.buracc.healthybot.api.openai.chat.ChatMessage
 import com.github.buracc.healthybot.api.openai.chat.ChatRequest
 import com.github.buracc.healthybot.api.openai.chat.ChatResponse
 import com.github.buracc.healthybot.api.openai.image.ImageRequest
@@ -14,17 +15,24 @@ class OpenAIClient(
     fun createChat(
         initialPrompt: String,
         model: String,
-        text: String,
-        discordId: String,
+        text: String
     ) = openAIRestTemplate.postForObject(
             "/chat/completions",
             ChatRequest.create(
                 text = "$initialPrompt$text",
-                discordId = discordId,
                 model = model
             ),
             ChatResponse::class.java
         )
+
+    fun createChat(
+        model: String,
+        messages: List<ChatMessage>
+    ) = openAIRestTemplate.postForObject(
+        "/chat/completions",
+        ChatRequest(model = model, messages = messages),
+        ChatResponse::class.java
+    )
 
     fun createImage(
         initialPrompt: String,
