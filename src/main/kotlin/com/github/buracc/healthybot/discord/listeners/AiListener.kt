@@ -47,7 +47,7 @@ class AiListener(
         while (reply != null) {
             val sender = reply.member
             if (sender != null) {
-                replyChain.add(ChatMessage(name = sender.effectiveName, content = reply.contentDisplay))
+                replyChain.add(ChatMessage(content = reply.contentDisplay))
             }
 
             reply = reply.referencedMessage
@@ -60,7 +60,7 @@ class AiListener(
             return
         }
 
-        messages.add(ChatMessage(name = member.effectiveName, content = prompt))
+        messages.add(ChatMessage(content = prompt))
 
         message.addReaction(Emoji.fromUnicode("💭")).queue()
 
