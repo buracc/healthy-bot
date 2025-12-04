@@ -47,7 +47,11 @@ class AiListener(
         while (reply != null) {
             val sender = reply.member
             if (sender != null) {
-                replyChain.add(ChatMessage(content = reply.contentDisplay))
+                var role = "user"
+                if (sender.id == member.id) {
+                    role = "developer"
+                }
+                replyChain.add(ChatMessage(role = role, name = member.effectiveName, content = reply.contentDisplay))
             }
 
             reply = reply.referencedMessage
@@ -60,7 +64,7 @@ class AiListener(
             return
         }
 
-        messages.add(ChatMessage(content = prompt))
+        messages.add(ChatMessage(name = member.effectiveName, content = prompt))
 
         message.addReaction(Emoji.fromUnicode("💭")).queue()
 
